@@ -1,3 +1,6 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "yaml.schemas": {
+    "/workspace/schemas/Community.json": ["communities.yml", "communities.yaml"]
+  }
 }

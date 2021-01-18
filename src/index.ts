@@ -1,6 +1,9 @@
 // src/index.ts
 import { timeout } from './Utils/timeout';
 import { logger, LogMode } from './Library/Logger';
+import { CommunityCircuitSpeed } from './Modules/CommunityCircuits/CommunityCircuitSpeed';
+
+console.log(Object.values(CommunityCircuitSpeed));
 
 /**
  * Logs a greeting for the name after a 1.5 second delay.

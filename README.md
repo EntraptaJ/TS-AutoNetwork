@@ -1,6 +1,6 @@
-# K-FOSS/TS-Core Repository Template
+# KristianFJones/TS-AutoNetwork
 
-This is a TypeScript project template.
+TODO
 
 ## Usage
 
