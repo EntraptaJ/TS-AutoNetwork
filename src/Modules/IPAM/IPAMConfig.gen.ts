@@ -45,14 +45,18 @@ export interface Community {
    * Short form community code
    */
   id: string;
-  sites: {
-    /**
-     * Site short id
-     */
-    id: string;
-    name: string;
-    devices?: Device[];
-  }[];
+  sites: CommunitySite[];
+}
+/**
+ * Community Site
+ */
+export interface CommunitySite {
+  /**
+   * Site short id
+   */
+  id: string;
+  name: string;
+  devices?: Device[];
 }
 /**
  * Network Device

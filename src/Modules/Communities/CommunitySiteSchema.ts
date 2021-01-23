@@ -1,7 +1,7 @@
-// src/Modules/CommunitySites/CommunitySiteConfigSchema.ts
+// src/Modules/Communities/CommunitySiteSchema.ts
 import jsonSchema from 'fluent-json-schema';
 
-export const communitySiteConfigSchema = jsonSchema
+export const communitySiteSchema = jsonSchema
   .object()
   .additionalProperties(false)
   .description('Community Site')

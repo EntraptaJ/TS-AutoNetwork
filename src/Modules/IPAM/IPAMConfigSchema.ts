@@ -1,44 +1,23 @@
 // src/Modules/Communities/CommunityConfigSchema.ts
 import jsonSchema from 'fluent-json-schema';
 import { circuitLocationSchema } from '../CommunityCircuits/CircuitLocationSchema';
-import { communityCircuitConfigSchema } from '../CommunityCircuits/CommunityCircuitConfigSchema';
+import { communityCircuitConfigSchema } from '../Communities/CommunityCircuitConfigSchema';
 import { communityContactConfigSchema } from '../CommunityContacts/CommunityContactConfigSchema';
-import { communitySiteConfigSchema } from '../CommunitySites/CommunitySiteConfigSchema';
+import { communitySiteSchema } from '../Communities/CommunitySiteSchema';
 import { networkCircuitSchema } from '../Networks/NetworkCircuitSchema';
 import { networkSchema } from '../Networks/NetworkSchema';
 import { networkDeviceConfigSchema } from '../NetworkDevices/NetworkDeviceConfigSchema';
 import { NetworkDeviceInterfaceType } from '../NetworkDevices/NetworkDeviceInterfaceType';
 import { networkDeviceLinkSchema } from '../NetworkDevices/NetworkDeviceLinkSchema';
 import { NetworkDeviceType } from '../NetworkDevices/NetworkDeviceType';
-
-const communitySchema = jsonSchema
-  .object()
-  .additionalProperties(false)
-  .id('#community')
-  .description('Community')
-  .prop('contact', jsonSchema.string().description('Community Contact ID'))
-  .prop(
-    'name',
-    jsonSchema.string().description('Community Friendly Name').required(),
-  )
-  .prop(
-    'id',
-    jsonSchema
-      .string()
-      .description('Short form community code')
-      .examples(['sxl'])
-      .required(),
-  )
-  .prop(
-    'sites',
-    jsonSchema.array().items(communitySiteConfigSchema).required(),
-  );
+import { communitySchema } from '../Communities/CommunitySchema';
 
 export const communityConfigSchema = jsonSchema
   .object()
   .additionalProperties(false)
   .description('IPAM Configuration File')
   .definition('community', communitySchema)
+  .definition('communitySite', communitySiteSchema)
   .definition('contact', communityContactConfigSchema)
   .definition('device', networkDeviceConfigSchema)
   .definition('networkcircuit', networkCircuitSchema)
