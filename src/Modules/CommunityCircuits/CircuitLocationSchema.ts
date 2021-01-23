@@ -5,6 +5,7 @@ import { CommunityCircuitSpeed } from './CommunityCircuitSpeed';
 export const circuitLocationSchema = jsonSchema
   .object()
   .description('Traditional external circuits')
+  .additionalProperties(false)
   .prop('id', jsonSchema.string().description('External circuit id'))
   .prop(
     'provider',

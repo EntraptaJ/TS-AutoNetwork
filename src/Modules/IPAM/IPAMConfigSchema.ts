@@ -1,7 +1,7 @@
 // src/Modules/Communities/CommunityConfigSchema.ts
 import jsonSchema from 'fluent-json-schema';
 import { circuitLocationSchema } from '../CommunityCircuits/CircuitLocationSchema';
-import { communityCircuitConfigSchema } from '../Communities/CommunityCircuitConfigSchema';
+import { circuitSchema } from '../Circuits/CircuitSchema';
 import { communityContactConfigSchema } from '../CommunityContacts/CommunityContactConfigSchema';
 import { communitySiteSchema } from '../Communities/CommunitySiteSchema';
 import { networkCircuitSchema } from '../Networks/NetworkCircuitSchema';
@@ -11,6 +11,9 @@ import { NetworkDeviceInterfaceType } from '../NetworkDevices/NetworkDeviceInter
 import { networkDeviceLinkSchema } from '../NetworkDevices/NetworkDeviceLinkSchema';
 import { NetworkDeviceType } from '../NetworkDevices/NetworkDeviceType';
 import { communitySchema } from '../Communities/CommunitySchema';
+import { circuitSideSchema } from '../Circuits/CircuitSideSchema';
+import { networkHostSchema } from '../Networks/NetworkHostSchema';
+import { networkRangeSchema } from '../Networks/NetworkRangeSchema';
 
 export const communityConfigSchema = jsonSchema
   .object()
@@ -23,8 +26,11 @@ export const communityConfigSchema = jsonSchema
   .definition('networkcircuit', networkCircuitSchema)
   .definition('networkDeviceLink', networkDeviceLinkSchema)
   .definition('circuitLocation', circuitLocationSchema)
-  .definition('circuit', communityCircuitConfigSchema)
+  .definition('circuit', circuitSchema)
+  .definition('circuitSide', circuitSideSchema)
   .definition('network', networkSchema)
+  .definition('networkHost', networkHostSchema)
+  .definition('networkRange', networkRangeSchema)
   .definition(
     'networkDeviceType',
     jsonSchema.string().enum(Object.values(NetworkDeviceType)),

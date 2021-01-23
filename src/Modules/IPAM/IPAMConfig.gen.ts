@@ -80,22 +80,15 @@ export interface Circuit {
    * Circuit ID
    */
   id: string;
-  sideA?: {
-    /**
-     * Circuit Location Id
-     */
-    id?: string;
-    [k: string]: unknown;
-  };
-  sideZ?: {
-    /**
-     * Circuit Location Id
-     */
-    id?: string;
-    [k: string]: unknown;
-  };
+  sideA: CircuitSide;
+  sideZ: CircuitSide;
   speed?: string;
-  [k: string]: unknown;
+}
+export interface CircuitSide {
+  /**
+   * Circuit Location Id
+   */
+  id: string;
 }
 /**
  * Traditional external circuits
@@ -118,7 +111,6 @@ export interface CircuitLocation {
    */
   address?: string;
   demarcSpeed?: "10M" | "100M" | "200M" | "300M" | "500M" | "1G" | "5G" | "10G";
-  [k: string]: unknown;
 }
 /**
  * Community Contact
@@ -147,24 +139,8 @@ export interface Network {
    * Contact ID
    */
   contact?: string;
-  hosts?: {
-    /**
-     * Host IP Address
-     */
-    ip: string;
-    /**
-     * Hostname for reverse DNS creation
-     */
-    hostname?: string;
-    description?: string;
-    device?: NetworkDeviceLink;
-  }[];
-  ranges?: {
-    start: string;
-    end: string;
-    description?: string;
-    type?: "DHCP" | "RESERVED" | "STATIC";
-  }[];
+  hosts?: NetworkHost[];
+  ranges?: NetworkRange[];
   /**
    * Children Networks
    */
@@ -184,6 +160,21 @@ export interface Networkcircuit {
   speed?: string;
 }
 /**
+ * Indivual Network host
+ */
+export interface NetworkHost {
+  /**
+   * Host IP Address
+   */
+  ip: string;
+  /**
+   * Hostname for reverse DNS creation
+   */
+  hostname?: string;
+  description?: string;
+  device?: NetworkDeviceLink;
+}
+/**
  * Link a Network to a device
  */
 export interface NetworkDeviceLink {
@@ -195,4 +186,13 @@ export interface NetworkDeviceLink {
    * Device interface
    */
   interface?: string;
+}
+/**
+ * Network Range
+ */
+export interface NetworkRange {
+  start: string;
+  end: string;
+  description?: string;
+  type?: "DHCP" | "RESERVED" | "STATIC";
 }
