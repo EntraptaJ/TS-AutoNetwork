@@ -1,10 +1,11 @@
 // src/Modules/NetworkDevices/NetworkDeviceConfigSchema.ts
 import jsonSchema from 'fluent-json-schema';
-import { NetworkDeviceType } from './NetworkDeviceType';
 
 export const networkDeviceConfigSchema = jsonSchema
   .object()
+  .additionalProperties(false)
+  .id('#device')
   .description('Network Device')
+  .prop('id', jsonSchema.string().description('Chained ID').required())
   .prop('name', jsonSchema.string().description('Friendly name').required())
-  .prop('type', jsonSchema.string().enum(Object.values(NetworkDeviceType)))
-  .prop('hostname', jsonSchema.string().description('Primary Hostname/IP'));
+  .prop('type', jsonSchema.ref('#/definitions/networkDeviceType'));

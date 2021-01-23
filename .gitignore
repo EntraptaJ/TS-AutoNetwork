@@ -140,3 +140,11 @@ temp/
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
 dist
+communities.yml
+communities.yaml
+IPAM.yaml
+ipam.yaml
+IPAM.yml
+ipam.yml
+ip_assign.txt
+communities0copy.yml
