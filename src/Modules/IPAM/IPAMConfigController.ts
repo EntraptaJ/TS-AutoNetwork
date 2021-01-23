@@ -2,7 +2,7 @@
 import { PathLike } from 'fs';
 import { readFile } from 'fs/promises';
 import { load } from 'js-yaml';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 import { logger, LogMode } from '../../Library/Logger';
 import { setContainer } from '../../Utils/Containers';
 import { isObjectType } from '../../Utils/isTypes';
@@ -166,6 +166,8 @@ export class IPAMConfigController {
       const circuits = this.processCircuits(ipamConfigFile.circuits);
       const networks = this.processNetworks(ipamConfigFile.networks);
 
+      Container.set('networks', networks);
+
       const ipam = new IPAM({
         circuitLocations,
         circuits,
@@ -174,8 +176,12 @@ export class IPAMConfigController {
         networks,
       });
 
-      for (const network of ipam.networks) {
-        network.hosts.map((networkHost) => console.log(networkHost.coreDevice));
+      const dns1Network = ipam.networks.find(
+        ({ prefix }) => prefix === '64.184.193.0/30',
+      );
+
+      if (dns1Network) {
+        console.log(dns1Network.IPv4);
       }
 
       return;

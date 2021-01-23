@@ -5,10 +5,15 @@ import { Circuit } from '../Circuits/Circuit';
 import { Contact } from '../CommunityContacts/CommunityContact';
 import { Network as IPAMNetwork } from '../IPAM/IPAMConfig.gen';
 import { NetworkHost } from './NetworkHost';
+import { Address4 } from 'ip-address';
 
 @Service()
 export class Network implements IPAMNetwork {
   public prefix: string;
+
+  public get IPv4(): Address4 {
+    return new Address4(this.prefix);
+  }
 
   public description: string;
 

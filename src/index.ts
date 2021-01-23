@@ -1,11 +1,23 @@
 // src/index.ts
+import 'reflect-metadata';
 import { timeout } from './Utils/timeout';
 import { logger, LogMode } from './Library/Logger';
 import { ipamConfigController } from './Modules/IPAM/IPAMConfigController';
+import Container from 'typedi';
+import { NetworkController } from './Modules/Networks/NetworkController';
+import { Address4 } from 'ip-address';
+import { getSmallestSubnet } from './Utils/Networks';
 
-const config = ipamConfigController.loadFile('IPAM.yaml');
+await ipamConfigController.loadFile('IPAM.yaml');
 
-console.log(config);
+const networkController = Container.get(NetworkController);
+
+console.log('Parsing IP');
+
+const ddosIP = new Address4('66.165.222.177/32');
+const networks = networkController.findIP(ddosIP);
+
+console.log('Lowest Network: ', getSmallestSubnet(networks));
 
 /* interface Country {
   name: string;

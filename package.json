@@ -47,6 +47,7 @@
     "fast-xml-parser": "^3.17.6",
     "fluent-json-schema": "^2.0.3",
     "got": "^11.8.1",
+    "ip-address": "^7.1.0",
     "js-yaml": "^3.14.1",
     "reflect-metadata": "^0.1.13",
     "typedi": "^0.10.0",
