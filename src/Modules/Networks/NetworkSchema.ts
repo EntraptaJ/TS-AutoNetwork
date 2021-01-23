@@ -8,6 +8,17 @@ export const networkSchema = jsonSchema
   .prop('prefix', jsonSchema.string().description('Network Prefix'))
   .prop('description', jsonSchema.string())
   .prop('circuit', jsonSchema.ref('#/definitions/networkcircuit'))
+  .prop(
+    'nsServers',
+    jsonSchema
+      .array()
+      .items(
+        jsonSchema
+          .string()
+          .description('Reverse DNS NS Server')
+          .format(jsonSchema.FORMATS.HOSTNAME),
+      ),
+  )
   .prop('contactId', jsonSchema.string().description('Contact ID'))
   .prop(
     'hosts',

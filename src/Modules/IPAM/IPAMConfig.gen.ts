@@ -5,7 +5,7 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type NetworkDeviceType = "router" | "switch" | "access-point" | "server" | "modem" | "firewall";
+export type NetworkDeviceType = "router" | "switch" | "access-point" | "server" | "modem" | "firewall" | "UPS";
 
 /**
  * IPAM Configuration File
@@ -135,6 +135,7 @@ export interface Network {
   prefix?: string;
   description?: string;
   circuit?: Networkcircuit;
+  nsServers?: string[];
   /**
    * Contact ID
    */
@@ -191,7 +192,13 @@ export interface NetworkDeviceLink {
  * Network Range
  */
 export interface NetworkRange {
+  /**
+   * Start IP for the range
+   */
   start: string;
+  /**
+   * End IP for the range
+   */
   end: string;
   description?: string;
   type?: "DHCP" | "RESERVED" | "STATIC";

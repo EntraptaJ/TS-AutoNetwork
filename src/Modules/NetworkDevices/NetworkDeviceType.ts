@@ -6,4 +6,5 @@ export enum NetworkDeviceType {
   SERVER = 'server',
   MODEM = 'modem',
   FIREWALL = 'firewall',
+  UPS = 'UPS',
 }

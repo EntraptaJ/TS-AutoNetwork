@@ -5,10 +5,20 @@ export const networkHostSchema = jsonSchema
   .object()
   .additionalProperties(false)
   .description('Indivual Network host')
-  .prop('ip', jsonSchema.string().description('Host IP Address').required())
+  .prop(
+    'ip',
+    jsonSchema
+      .string()
+      .description('Host IP Address')
+      .format(jsonSchema.FORMATS.IPV4)
+      .required(),
+  )
   .prop(
     'hostname',
-    jsonSchema.string().description('Hostname for reverse DNS creation'),
+    jsonSchema
+      .string()
+      .description('Hostname for reverse DNS creation')
+      .format(jsonSchema.FORMATS.HOSTNAME),
   )
   .prop('description', jsonSchema.string())
   .prop('device', jsonSchema.ref('#/definitions/networkDeviceLink'));

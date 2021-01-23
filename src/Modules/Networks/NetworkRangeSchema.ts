@@ -6,7 +6,21 @@ export const networkRangeSchema = jsonSchema
   .object()
   .additionalProperties(false)
   .description('Network Range')
-  .prop('start', jsonSchema.string().required())
-  .prop('end', jsonSchema.string().required())
+  .prop(
+    'start',
+    jsonSchema
+      .string()
+      .description('Start IP for the range')
+      .format(jsonSchema.FORMATS.IPV4)
+      .required(),
+  )
+  .prop(
+    'end',
+    jsonSchema
+      .string()
+      .description('End IP for the range')
+      .format(jsonSchema.FORMATS.IPV4)
+      .required(),
+  )
   .prop('description', jsonSchema.string())
   .prop('type', jsonSchema.string().enum(Object.values(NetworkRangeType)));
