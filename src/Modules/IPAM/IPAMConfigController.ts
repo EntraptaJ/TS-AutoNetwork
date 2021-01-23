@@ -2,7 +2,7 @@
 import { PathLike } from 'fs';
 import { readFile } from 'fs/promises';
 import { load } from 'js-yaml';
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
 import { logger, LogMode } from '../../Library/Logger';
 import { setContainer } from '../../Utils/Containers';
 import { isObjectType } from '../../Utils/isTypes';

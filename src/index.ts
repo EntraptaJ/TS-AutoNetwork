@@ -1,7 +1,6 @@
 // src/index.ts
 import { timeout } from './Utils/timeout';
 import { logger, LogMode } from './Library/Logger';
-import Ajv, { JSONSchemaType } from 'ajv/dist/2019';
 import { ipamConfigController } from './Modules/IPAM/IPAMConfigController';
 
 const config = ipamConfigController.loadFile('IPAM.yaml');
