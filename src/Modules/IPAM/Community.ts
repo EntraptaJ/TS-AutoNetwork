@@ -1,5 +1,6 @@
 // src/Modules/Communities/Community.ts
 import Container, { Service, Token } from 'typedi';
+import { createContainerName } from '../../Utils/Containers';
 import { CommunitySite } from '../Communities/CommunitySite';
 import { Contact } from '../CommunityContacts/CommunityContact';
 
@@ -14,7 +15,7 @@ export class Community {
   public sites: CommunitySite[];
 
   public get contact(): Contact {
-    return Container.get(`contact-${this.contactId}`);
+    return Container.get(createContainerName('CONTACT', this.contactId));
   }
 
   public constructor(options: Partial<Community>) {

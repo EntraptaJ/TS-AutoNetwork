@@ -138,7 +138,7 @@ export interface Network {
   /**
    * Contact ID
    */
-  contact?: string;
+  contactId?: string;
   hosts?: NetworkHost[];
   ranges?: NetworkRange[];
   /**

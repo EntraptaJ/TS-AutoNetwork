@@ -4,6 +4,7 @@ import { readFile } from 'fs/promises';
 import { load } from 'js-yaml';
 import Container, { Service } from 'typedi';
 import { logger, LogMode } from '../../Library/Logger';
+import { setContainer } from '../../Utils/Containers';
 import { isObjectType } from '../../Utils/isTypes';
 import { Circuit } from '../Circuits/Circuit';
 import { CircuitLocation } from '../Circuits/CircuitLocation';
@@ -32,7 +33,7 @@ export class IPAMConfigController {
     return contacts.map((contactValues) => {
       const contact = new Contact(contactValues);
 
-      Container.set(`contact-${contact.id}`, contact);
+      setContainer('CONTACT', contact.id, contact);
 
       return contact;
     });
@@ -42,7 +43,7 @@ export class IPAMConfigController {
     return devices.map((deviceValues) => {
       const device = new NetworkDevice(deviceValues);
 
-      Container.set(`networkDevice-${device.id}`, device);
+      setContainer('SITE_DEVICE', device.id, device);
 
       return device;
     });
@@ -58,7 +59,7 @@ export class IPAMConfigController {
             : [],
       });
 
-      Container.set(`communitySite-${communitySite.id}`, communitySite);
+      setContainer('SITE', communitySite.id, communitySite);
 
       return communitySite;
     });
@@ -82,7 +83,7 @@ export class IPAMConfigController {
     return circuitLocations.map((circuitLocationValues) => {
       const circuitLocation = new CircuitLocation(circuitLocationValues);
 
-      Container.set(`circuitLocation-${circuitLocation.id}`, circuitLocation);
+      setContainer('CIRCUIT_LOCATION', circuitLocation.id, circuitLocation);
 
       return circuitLocation;
     });
@@ -92,7 +93,7 @@ export class IPAMConfigController {
     return circuits.map((circuitValues) => {
       const circuit = new Circuit(circuitValues);
 
-      Container.set(`circuit-${circuit.id}`, circuit);
+      setContainer('CIRCUIT', circuit.id, circuit);
 
       return circuit;
     });
@@ -102,7 +103,7 @@ export class IPAMConfigController {
     return networkHosts.map((networkHostValue) => {
       const networkHost = new NetworkHost(networkHostValue);
 
-      Container.set(`networkHost-${networkHost.ip}`, networkHost);
+      setContainer('NETWORK_HOST', networkHost.ip, networkHost);
 
       return networkHost;
     });
@@ -129,7 +130,7 @@ export class IPAMConfigController {
           ...networkValues,
         });
 
-        Container.set(`network-${network.prefix}`, network);
+        setContainer('NETWORK', network.prefix, network);
 
         return [network, ...subNetworks];
       },
@@ -180,7 +181,7 @@ export class IPAMConfigController {
       return;
     }
 
-    throw new Error('Invlaid Firewalls configuration file');
+    throw new Error('Invalid IPAM configuration file');
   }
 }
 

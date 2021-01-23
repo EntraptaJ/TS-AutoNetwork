@@ -8,7 +8,7 @@ export const networkSchema = jsonSchema
   .prop('prefix', jsonSchema.string().description('Network Prefix'))
   .prop('description', jsonSchema.string())
   .prop('circuit', jsonSchema.ref('#/definitions/networkcircuit'))
-  .prop('contact', jsonSchema.string().description('Contact ID'))
+  .prop('contactId', jsonSchema.string().description('Contact ID'))
   .prop(
     'hosts',
     jsonSchema.array().items(jsonSchema.ref('#/definitions/networkHost')),

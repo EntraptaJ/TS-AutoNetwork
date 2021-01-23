@@ -1,5 +1,6 @@
 // src/Modules/Circuits/Circuit.ts
 import Container, { Service } from 'typedi';
+import { createContainerName } from '../../Utils/Containers';
 import {
   Circuit as IPAMCircuit,
   CircuitSide as IPAMCircuitSide,
@@ -14,11 +15,15 @@ export class Circuit implements IPAMCircuit {
   public sideZ: IPAMCircuitSide;
 
   public get sideACircuitLocation(): Circuit {
-    return Container.get(`circuitLocation-${this.sideA.id}`);
+    return Container.get(
+      createContainerName('CIRCUIT_LOCATION', this.sideA.id),
+    );
   }
 
   public get sideZCircuitLocation(): Circuit {
-    return Container.get(`circuitLocation-${this.sideZ.id}`);
+    return Container.get(
+      createContainerName('CIRCUIT_LOCATION', this.sideZ.id),
+    );
   }
 
   public constructor(options: Partial<Circuit>) {

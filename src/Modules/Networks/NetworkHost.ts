@@ -1,5 +1,6 @@
 // src/Modules/Networks/NetworkHost.ts
 import Container, { Service } from 'typedi';
+import { createContainerName } from '../../Utils/Containers';
 import {
   NetworkDeviceLink,
   NetworkHost as IPAMNetworkHost,
@@ -14,9 +15,11 @@ export class NetworkHost implements IPAMNetworkHost {
 
   public device?: NetworkDeviceLink;
 
+  public hostname?: string;
+
   public get coreDevice(): NetworkDevice | undefined {
     if (this.device?.id) {
-      return Container.get(`networkDevice-${this.device.id}`);
+      return Container.get(createContainerName('SITE_DEVICE', this.device.id));
     }
   }
 
