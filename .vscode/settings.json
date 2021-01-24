@@ -1,6 +1,6 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "yaml.schemas": {
-    "/workspace/schemas/IPAM.json": ["ipam.yml", "ipam.yaml", "IPAM.yaml", "IPAM.yml"]
+    "/workspace/schemas/IPAM.json": ["ipam.yml", "ipam.yaml", "IPAM.yaml", "IPAM.yml", "**/fixtures/*.yml", "**/fixtures/*.yaml"]
   }
 }

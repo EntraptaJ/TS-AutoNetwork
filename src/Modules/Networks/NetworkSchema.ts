@@ -27,7 +27,7 @@ export const networkSchema = jsonSchema
       .description(`Network Type`)
       .enum(Object.values(NetworkType)),
   )
-  .prop('contactId', jsonSchema.string().description('Contact ID'))
+  .prop('contactId', jsonSchema.ref('#/definitions/contactId'))
   .prop(
     'hosts',
     jsonSchema.array().items(jsonSchema.ref('#/definitions/networkHost')),

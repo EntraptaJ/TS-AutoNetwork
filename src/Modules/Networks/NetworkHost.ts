@@ -1,6 +1,7 @@
 // src/Modules/Networks/NetworkHost.ts
 import Container, { Service } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
+import { Contact } from '../Contacts/Contact';
 import {
   NetworkDeviceLink,
   NetworkHost as IPAMNetworkHost,
@@ -12,6 +13,9 @@ import { Network } from './Network';
 export class NetworkHost implements IPAMNetworkHost {
   public ip: string;
 
+  /**
+   * Friendly Description for the Network Host
+   */
   public description: string;
 
   public device?: NetworkDeviceLink;
@@ -20,6 +24,25 @@ export class NetworkHost implements IPAMNetworkHost {
 
   public parentNetworkId: string;
 
+  /**
+   * Unique Contact Id reference
+   */
+  public contactId?: string;
+
+  /**
+   * Retrieve the contact from the contactId
+   */
+  public get contact(): Contact | undefined {
+    if (!this.contactId) {
+      return undefined;
+    }
+
+    return Container.get(createContainerName('CONTACT', this.contactId));
+  }
+
+  /**
+   * Retrieve the Parent network from the parentNetworkId
+   */
   public get parentNetwork(): Network {
     return Container.get(createContainerName('NETWORK', this.parentNetworkId));
   }

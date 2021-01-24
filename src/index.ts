@@ -8,17 +8,41 @@ import { NetworkController } from './Modules/Networks/NetworkController';
 import { Address4 } from 'ip-address';
 import { getSmallestSubnet } from './Utils/Networks';
 
-await ipamConfigController.loadFile('IPAM.yaml');
+const ipam = await ipamConfigController.loadFile('IPAM.yaml');
+console.log(ipam);
 
 const networkController = Container.get(NetworkController);
-
-console.log('Parsing IP');
 
 const ddosIP = new Address4('66.165.222.177/32');
 const networks = networkController.findIP(ddosIP);
 
-const device = getSmallestSubnet(networks).hosts[1].coreDevice;
+const device = getSmallestSubnet(networks);
+console.log(device.contact);
 
+/* const community = ipam.communities.find(({ name }) => name === 'Toronto');
+
+if (community?.sites) {
+  console.log(community.contact);
+
+  for (const site of community.sites) {
+    console.log(site);
+
+    for (const siteDevice of site.devices) {
+      console.log(siteDevice);
+    }
+  }
+} */
+
+/* if (device) {
+  for (const deviceInterface of device.interfaces) {
+    console.log(
+      `Interface ${deviceInterface?.interface}`,
+      deviceInterface?.ip.address,
+    );
+  }
+} */
+
+/* 
 if (device) {
   const deviceHosts = device.getDeviceHosts();
 
@@ -28,11 +52,11 @@ if (device) {
         continue;
       }
 
-      console.log(networkHost.coreDevice);
+      console.log(networkHost.coreDevice?.interfaces);
     }
   }
 }
-
+ */
 /* interface Country {
   name: string;
 }

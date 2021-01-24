@@ -2,7 +2,7 @@
 import jsonSchema from 'fluent-json-schema';
 import { circuitLocationSchema } from '../CommunityCircuits/CircuitLocationSchema';
 import { circuitSchema } from '../Circuits/CircuitSchema';
-import { communityContactConfigSchema } from '../CommunityContacts/CommunityContactConfigSchema';
+import { contactSchema } from '../Contacts/ContactSchema';
 import { communitySiteSchema } from '../Communities/CommunitySiteSchema';
 import { networkCircuitSchema } from '../Networks/NetworkCircuitSchema';
 import { networkSchema } from '../Networks/NetworkSchema';
@@ -21,7 +21,13 @@ export const communityConfigSchema = jsonSchema
   .description('IPAM Configuration File')
   .definition('community', communitySchema)
   .definition('communitySite', communitySiteSchema)
-  .definition('contact', communityContactConfigSchema)
+  .definition('contact', contactSchema)
+  .definition(
+    'contactId',
+    jsonSchema
+      .string()
+      .description('Unique Identifier for referencing Contact'),
+  )
   .definition('device', networkDeviceConfigSchema)
   .definition('networkcircuit', networkCircuitSchema)
   .definition('networkDeviceLink', networkDeviceLinkSchema)

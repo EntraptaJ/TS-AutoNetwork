@@ -9,11 +9,11 @@ import { isObjectType } from '../../Utils/isTypes';
 import { Circuit } from '../Circuits/Circuit';
 import { CircuitLocation } from '../Circuits/CircuitLocation';
 import { CommunitySite } from '../Communities/CommunitySite';
-import { Contact } from '../CommunityContacts/CommunityContact';
+import { Contact } from '../Contacts/Contact';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
 import { Network } from '../Networks/Network';
 import { NetworkHost } from '../Networks/NetworkHost';
-import { Community } from './Community';
+import { Community } from '../Communities/Community';
 import { IPAM } from './IPAM';
 import {
   IPAM as IPAMType,
@@ -66,15 +66,17 @@ export class IPAMConfigController {
   }
 
   public processCommunities(communities: IPAMCommunity[]): Community[] {
-    return communities.map((communityValue) => {
-      const community = new Community({
-        contactId: communityValue.contact,
-        name: communityValue.name,
-        sites: this.processSites(communityValue.sites),
-      });
+    return communities.map(
+      ({ sites, contact: contactId, ...communityValues }) => {
+        const community = new Community({
+          ...communityValues,
+          contactId,
+          sites: this.processSites(sites),
+        });
 
-      return community;
-    });
+        return community;
+      },
+    );
   }
 
   public processCircuitLocations(
@@ -121,7 +123,10 @@ export class IPAMConfigController {
     });
   }
 
-  public processNetworks(networks: IPAMNetwork[]): Network[] {
+  public processNetworks(
+    networks: IPAMNetwork[],
+    parentNetwork?: Network,
+  ): Network[] {
     return networks.flatMap(
       ({
         circuit,
@@ -129,15 +134,23 @@ export class IPAMConfigController {
         hosts: hostsValue,
         ...networkValues
       }) => {
-        const subNetworks = subNetworksValues
-          ? this.processNetworks(subNetworksValues)
-          : [];
-
         const network = new Network({
           circuitId: circuit?.id,
-          networks: subNetworks,
+          parentNetworkId: parentNetwork?.prefix,
           ...networkValues,
         });
+
+        const subNetworks = subNetworksValues
+          ? this.processNetworks(subNetworksValues, network)
+          : [];
+
+        if (parentNetwork) {
+          Container.set({
+            id: `networks-${parentNetwork.prefix}`,
+            multiple: true,
+            value: network,
+          });
+        }
 
         const hosts = hostsValue
           ? this.processNetworkHosts(hostsValue, network)
@@ -154,7 +167,7 @@ export class IPAMConfigController {
   /**
    * Load the configured firewalls configuration file from disk, parse the YAML and load into the class
    */
-  public async loadFile(filePath?: PathLike): Promise<void> {
+  public async loadFile(filePath?: PathLike): Promise<IPAM> {
     const ipamConfigFilePath = filePath || 'ipam.yml';
 
     const ipamFile = await readFile(ipamConfigFilePath);
@@ -182,23 +195,13 @@ export class IPAMConfigController {
 
       Container.set('networks', networks);
 
-      const ipam = new IPAM({
+      return new IPAM({
         circuitLocations,
         circuits,
         communities,
         contacts,
         networks,
       });
-
-      const dns1Network = ipam.networks.find(
-        ({ prefix }) => prefix === '64.184.193.0/30',
-      );
-
-      if (dns1Network) {
-        console.log(dns1Network.IPv4);
-      }
-
-      return;
     }
 
     throw new Error('Invalid IPAM configuration file');

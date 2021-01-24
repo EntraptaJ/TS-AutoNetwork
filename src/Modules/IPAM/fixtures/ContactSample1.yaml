@@ -1,0 +1,44 @@
+communities:
+  - name: Lab 1
+    id: lab1
+    contact: lab1.kfj
+    sites:
+      - id: lab1.site1 
+        name: Lab Site 1
+  
+  - name: Core 1
+    id: core1
+    contact: core1.hello
+    sites:
+      - id: core1.site1 
+        name: Core Site 1
+
+networks:
+  - prefix: 1.1.1.0/24
+    description: HelloWorld
+
+circuits:
+  - id: core.lab1
+    sideA:
+      id: circuit1
+    sideZ:
+      id: circuit2
+
+circuitLocations:
+  - id: circuit1
+    address: lab1 street 1
+    communuity: lab1
+    provider: Core Provider
+    demarcSpeed: 1G
+
+  - id: circuit2
+    address: Core Site 1, Street 5859
+    communuity: core1
+    demarcSpeed: 10G
+    provider: Core Provider
+
+contacts:
+  - id: lab.kfj
+    name: Kristian Jones
+  - id: core1.site1
+    name: Hello World

@@ -6,7 +6,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "echo TODO",
+    "test": "ts-estest ./src/",
     "prepublishOnly": "npm run build",
     "build": "tsc -p ./tsconfig.build.json",
     "start:debug": "node --loader @k-foss/ts-esnode --experimental-modules --experimental-specifier-resolution=node --harmony-top-level-await ./",

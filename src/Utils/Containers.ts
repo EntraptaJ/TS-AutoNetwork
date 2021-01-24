@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { Circuit } from '../Modules/Circuits/Circuit';
 import { CircuitLocation } from '../Modules/Circuits/CircuitLocation';
 import { CommunitySite } from '../Modules/Communities/CommunitySite';
-import { Contact } from '../Modules/CommunityContacts/CommunityContact';
+import { Contact } from '../Modules/Contacts/Contact';
 import { NetworkDevice } from '../Modules/NetworkDevices/NetworkDevice';
 import { Network } from '../Modules/Networks/Network';
 import { NetworkHost } from '../Modules/Networks/NetworkHost';
@@ -42,6 +42,8 @@ export function setContainer<T extends keyof typeof ContainerKeys>(
   value: ValueTypes[T],
   container = Container,
 ): void {
+  const containerName = createContainerName(key, id);
+
   if (key === 'NETWORK_HOST') {
     container.set({
       id: key,
@@ -50,5 +52,5 @@ export function setContainer<T extends keyof typeof ContainerKeys>(
     });
   }
 
-  container.set(createContainerName(key, id), value);
+  container.set(containerName, value);
 }

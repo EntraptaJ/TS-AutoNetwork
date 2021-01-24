@@ -20,5 +20,6 @@ export const networkHostSchema = jsonSchema
       .description('Hostname for reverse DNS creation')
       .format(jsonSchema.FORMATS.HOSTNAME),
   )
+  .prop('contactId', jsonSchema.ref('#/definitions/contactId'))
   .prop('description', jsonSchema.string())
   .prop('device', jsonSchema.ref('#/definitions/networkDeviceLink'));

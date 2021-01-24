@@ -3,9 +3,9 @@
 import { Service } from 'typedi';
 import { Circuit } from '../Circuits/Circuit';
 import { CircuitLocation } from '../Circuits/CircuitLocation';
-import { Contact } from '../CommunityContacts/CommunityContact';
+import { Contact } from '../Contacts/Contact';
 import { Network } from '../Networks/Network';
-import { Community } from './Community';
+import { Community } from '../Communities/Community';
 
 @Service()
 export class IPAM {

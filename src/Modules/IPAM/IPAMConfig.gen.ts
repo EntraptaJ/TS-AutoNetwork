@@ -6,6 +6,10 @@
  */
 
 export type NetworkDeviceType = "router" | "switch" | "access-point" | "server" | "modem" | "firewall" | "UPS";
+/**
+ * Unique Identifier for referencing Contact
+ */
+export type ContactId = string;
 
 /**
  * IPAM Configuration File
@@ -116,10 +120,7 @@ export interface CircuitLocation {
  * Community Contact
  */
 export interface Contact {
-  /**
-   * Unique contact ID
-   */
-  id: string;
+  id: ContactId;
   /**
    * Contact Full Name
    */
@@ -140,10 +141,7 @@ export interface Network {
    * Network Type
    */
   type?: "UNALLOCATED" | "EXTERNAL";
-  /**
-   * Contact ID
-   */
-  contactId?: string;
+  contactId?: ContactId;
   hosts?: NetworkHost[];
   ranges?: NetworkRange[];
   /**
@@ -176,6 +174,7 @@ export interface NetworkHost {
    * Hostname for reverse DNS creation
    */
   hostname?: string;
+  contactId?: ContactId;
   description?: string;
   device?: NetworkDeviceLink;
 }
