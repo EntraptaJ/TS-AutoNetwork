@@ -17,7 +17,21 @@ console.log('Parsing IP');
 const ddosIP = new Address4('66.165.222.177/32');
 const networks = networkController.findIP(ddosIP);
 
-console.log('Lowest Network: ', getSmallestSubnet(networks));
+const device = getSmallestSubnet(networks).hosts[1].coreDevice;
+
+if (device) {
+  const deviceHosts = device.getDeviceHosts();
+
+  for (const deviceHost of deviceHosts) {
+    for (const networkHost of deviceHost.parentNetwork.hosts) {
+      if (networkHost?.device?.id === device.id) {
+        continue;
+      }
+
+      console.log(networkHost.coreDevice);
+    }
+  }
+}
 
 /* interface Country {
   name: string;

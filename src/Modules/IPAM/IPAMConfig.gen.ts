@@ -137,6 +137,10 @@ export interface Network {
   circuit?: Networkcircuit;
   nsServers?: string[];
   /**
+   * Network Type
+   */
+  type?: "UNALLOCATED" | "EXTERNAL";
+  /**
    * Contact ID
    */
   contactId?: string;
@@ -201,5 +205,5 @@ export interface NetworkRange {
    */
   end: string;
   description?: string;
-  type?: "DHCP" | "RESERVED" | "STATIC";
+  type?: "DHCP" | "RESERVED" | "STATIC" | "FREE" | "unallocated";
 }

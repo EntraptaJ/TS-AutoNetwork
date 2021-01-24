@@ -1,5 +1,6 @@
 // src/Modues/Network/NetworkSchema.ts
 import jsonSchema from 'fluent-json-schema';
+import { NetworkType } from './NetworkType';
 
 export const networkSchema = jsonSchema
   .object()
@@ -18,6 +19,13 @@ export const networkSchema = jsonSchema
           .description('Reverse DNS NS Server')
           .format(jsonSchema.FORMATS.HOSTNAME),
       ),
+  )
+  .prop(
+    'type',
+    jsonSchema
+      .string()
+      .description(`Network Type`)
+      .enum(Object.values(NetworkType)),
   )
   .prop('contactId', jsonSchema.string().description('Contact ID'))
   .prop(

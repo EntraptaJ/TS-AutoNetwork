@@ -21,9 +21,13 @@ export class Network implements IPAMNetwork {
 
   public networks?: Network[];
 
-  public hosts: NetworkHost[];
+  public get hosts(): NetworkHost[] {
+    return Container.getMany(`networkHost-${this.prefix}`);
+  }
 
   public contactId?: string;
+
+  public free?: boolean;
 
   public get contact(): Contact | undefined {
     if (this.contactId) {

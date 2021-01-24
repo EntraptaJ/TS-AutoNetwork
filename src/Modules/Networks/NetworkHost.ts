@@ -6,6 +6,7 @@ import {
   NetworkHost as IPAMNetworkHost,
 } from '../IPAM/IPAMConfig.gen';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
+import { Network } from './Network';
 
 @Service()
 export class NetworkHost implements IPAMNetworkHost {
@@ -16,6 +17,12 @@ export class NetworkHost implements IPAMNetworkHost {
   public device?: NetworkDeviceLink;
 
   public hostname?: string;
+
+  public parentNetworkId: string;
+
+  public get parentNetwork(): Network {
+    return Container.get(createContainerName('NETWORK', this.parentNetworkId));
+  }
 
   public get coreDevice(): NetworkDevice | undefined {
     if (this.device?.id) {

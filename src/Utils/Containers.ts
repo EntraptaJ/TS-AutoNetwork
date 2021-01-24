@@ -42,5 +42,13 @@ export function setContainer<T extends keyof typeof ContainerKeys>(
   value: ValueTypes[T],
   container = Container,
 ): void {
+  if (key === 'NETWORK_HOST') {
+    container.set({
+      id: key,
+      value,
+      multiple: true,
+    });
+  }
+
   container.set(createContainerName(key, id), value);
 }

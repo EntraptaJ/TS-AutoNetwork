@@ -3,4 +3,6 @@ export enum NetworkRangeType {
   DHCP = 'DHCP',
   RESERVED = 'RESERVED',
   STATIC = 'STATIC',
+  FREE = 'FREE',
+  UNALLOCATED = 'unallocated',
 }

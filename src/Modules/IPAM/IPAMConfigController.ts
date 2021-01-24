@@ -99,9 +99,21 @@ export class IPAMConfigController {
     });
   }
 
-  public processNetworkHosts(networkHosts: IPAMNetworkHost[]): NetworkHost[] {
+  public processNetworkHosts(
+    networkHosts: IPAMNetworkHost[],
+    parentNetwork: Network,
+  ): NetworkHost[] {
     return networkHosts.map((networkHostValue) => {
-      const networkHost = new NetworkHost(networkHostValue);
+      const networkHost = new NetworkHost({
+        ...networkHostValue,
+        parentNetworkId: parentNetwork.prefix,
+      });
+
+      Container.set({
+        id: `networkHost-${parentNetwork.prefix}`,
+        multiple: true,
+        value: networkHost,
+      });
 
       setContainer('NETWORK_HOST', networkHost.ip, networkHost);
 
@@ -121,14 +133,16 @@ export class IPAMConfigController {
           ? this.processNetworks(subNetworksValues)
           : [];
 
-        const hosts = hostsValue ? this.processNetworkHosts(hostsValue) : [];
-
         const network = new Network({
           circuitId: circuit?.id,
           networks: subNetworks,
-          hosts,
           ...networkValues,
         });
+
+        const hosts = hostsValue
+          ? this.processNetworkHosts(hostsValue, network)
+          : [];
+        logger.log(LogMode.DEBUG, 'hosts', hosts);
 
         setContainer('NETWORK', network.prefix, network);
 
