@@ -13,7 +13,8 @@ export type NetworkDeviceType =
   | "modem"
   | "firewall"
   | "UPS"
-  | "cell-vpn";
+  | "cell-vpn"
+  | "cell-gw";
 /**
  * Unique Identifier for referencing Contact
  */

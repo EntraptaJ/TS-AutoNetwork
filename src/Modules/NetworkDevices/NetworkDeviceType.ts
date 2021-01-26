@@ -8,4 +8,5 @@ export enum NetworkDeviceType {
   FIREWALL = 'firewall',
   UPS = 'UPS',
   CELLULAR_VPN = 'cell-vpn',
+  CELLULAR_GW = 'cell-gw',
 }
