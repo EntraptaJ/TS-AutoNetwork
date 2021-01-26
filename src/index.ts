@@ -9,15 +9,60 @@ import { Address4 } from 'ip-address';
 import { getSmallestSubnet } from './Utils/Networks';
 
 const ipam = await ipamConfigController.loadFile('IPAM.yaml');
-console.log(ipam);
+
+const communityCount = ipam.communities.length;
+const totalCommunity = 80;
+
+console.log(
+  `Currently have ${communityCount} communities entered out of ${totalCommunity}, ${
+    totalCommunity - communityCount
+  } remaining `,
+);
+
+const toronto = ipam.communities.find(({ id }) => id === 'tor');
+
+const c74 = toronto?.sites.find(({ id }) => id === 'tor.c74');
+
+const coreRouter = c74?.devices.find(({ id }) => id === 'tor.c74.rt1');
+
+const networkHosts = coreRouter?.getNetworkHosts();
+
+if (networkHosts) {
+  for (const networkHost of networkHosts) {
+    const circuit = networkHost.parentNetwork.circuit;
+
+    if (networkHost.device?.interface && circuit?.id) {
+      console.log(
+        `${
+          networkHost.device.interface
+        } circuit run at ${circuit
+          .parsedCircuitSpeed()
+          .convertTo('Mb')} for community: ${
+          circuit.sideACircuitLocation.communuity.name
+        }`,
+      );
+    } else {
+      console.log(`No device Interface or circuit`, networkHost);
+    }
+  }
+}
 
 const networkController = Container.get(NetworkController);
 
-const ddosIP = new Address4('66.165.222.177/32');
+const ddosIP = new Address4('66.165.192.189/32');
 const networks = networkController.findIP(ddosIP);
 
 const device = getSmallestSubnet(networks);
-console.log(device.contact);
+
+/* if (device.circuit?.speed) {
+  for (const network of device.circuit.networks) {
+    for (const host of network.hosts) {
+      console.log(
+        `${host.device?.interface} runs at ${device.circuit.sideA.id}`,
+      );
+    }
+  }
+} */
 
 /* const community = ipam.communities.find(({ name }) => name === 'Toronto');
 

@@ -4,11 +4,11 @@ import { readFile } from 'fs/promises';
 import { load } from 'js-yaml';
 import Container, { Service } from 'typedi';
 import { logger, LogMode } from '../../Library/Logger';
-import { setContainer } from '../../Utils/Containers';
+import { createContainerName, setContainer } from '../../Utils/Containers';
 import { isObjectType } from '../../Utils/isTypes';
 import { Circuit } from '../Circuits/Circuit';
 import { CircuitLocation } from '../Circuits/CircuitLocation';
-import { CommunitySite } from '../Communities/CommunitySite';
+import { Site } from '../Sites/Site';
 import { Contact } from '../Contacts/Contact';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
 import { Network } from '../Networks/Network';
@@ -49,9 +49,9 @@ export class IPAMConfigController {
     });
   }
 
-  public processSites(sites: IPAMCommunitySite[]): CommunitySite[] {
+  public processSites(sites: IPAMCommunitySite[]): Site[] {
     return sites.map((communitySiteValues) => {
-      const communitySite = new CommunitySite({
+      const communitySite = new Site({
         ...communitySiteValues,
         devices:
           typeof communitySiteValues.devices !== 'undefined'
@@ -74,6 +74,8 @@ export class IPAMConfigController {
           sites: this.processSites(sites),
         });
 
+        setContainer('COMMUNITY', community.id, community);
+
         return community;
       },
     );
@@ -82,13 +84,18 @@ export class IPAMConfigController {
   public processCircuitLocations(
     circuitLocations: IPAMCircuitLocation[],
   ): CircuitLocation[] {
-    return circuitLocations.map((circuitLocationValues) => {
-      const circuitLocation = new CircuitLocation(circuitLocationValues);
+    return circuitLocations.map(
+      ({ communuity, ...communityLocationValues }) => {
+        const circuitLocation = new CircuitLocation({
+          communuityId: communuity,
+          ...communityLocationValues,
+        });
 
-      setContainer('CIRCUIT_LOCATION', circuitLocation.id, circuitLocation);
+        setContainer('CIRCUIT_LOCATION', circuitLocation.id, circuitLocation);
 
-      return circuitLocation;
-    });
+        return circuitLocation;
+      },
+    );
   }
 
   public processCircuits(circuits: IPAMCircuit[]): Circuit[] {
@@ -140,6 +147,15 @@ export class IPAMConfigController {
           ...networkValues,
         });
 
+        if (network.circuitId) {
+          Container.set({
+            id: `circuitNetworks-${network.circuitId}`,
+            multiple: true,
+            value: () =>
+              Container.get(createContainerName('NETWORK', network.prefix)),
+          });
+        }
+
         const subNetworks = subNetworksValues
           ? this.processNetworks(subNetworksValues, network)
           : [];
@@ -152,10 +168,9 @@ export class IPAMConfigController {
           });
         }
 
-        const hosts = hostsValue
-          ? this.processNetworkHosts(hostsValue, network)
-          : [];
-        logger.log(LogMode.DEBUG, 'hosts', hosts);
+        if (hostsValue) {
+          this.processNetworkHosts(hostsValue, network);
+        }
 
         setContainer('NETWORK', network.prefix, network);
 

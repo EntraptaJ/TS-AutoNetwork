@@ -5,7 +5,15 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type NetworkDeviceType = "router" | "switch" | "access-point" | "server" | "modem" | "firewall" | "UPS";
+export type NetworkDeviceType =
+  | "router"
+  | "switch"
+  | "access-point"
+  | "server"
+  | "modem"
+  | "firewall"
+  | "UPS"
+  | "cell-vpn";
 /**
  * Unique Identifier for referencing Contact
  */
@@ -60,6 +68,17 @@ export interface CommunitySite {
    */
   id: string;
   name: string;
+  type?:
+    | "Network Headend"
+    | "Community Center"
+    | "Health Center"
+    | "Cell Tower"
+    | "Colocation"
+    | "Band Office"
+    | "School"
+    | "Lake HeadU"
+    | "KO Office"
+    | "Tower";
   devices?: Device[];
 }
 /**
