@@ -4,10 +4,13 @@
       "owner": "eslint-compact",
       "pattern": [
         {
-          "regexp": ".*path:s(S+)s+message:s\"(.*)\"s+line:s(d)",
+          "regexp": "^(.+):\\sline\\s(\\d+),\\scol\\s(\\d+),\\s(Error|Warning|Info)\\s-\\s(.+)\\s\\((.+)\\)$",
           "file": 1,
-          "line": 3,
-          "message": 2
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5,
+          "code": 6
         }
       ]
     }
