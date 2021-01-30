@@ -12,7 +12,12 @@ import { load } from 'js-yaml';
 import { defaultMetadataStorage } from 'class-transformer/storage';
 import { transformAndValidate } from 'class-transformer-validator';
 import { ValidationError } from 'class-validator';
-import { ValueTypes } from '../../Utils/Types';
+import {
+  ContainerKeys,
+  isContainerKey,
+  TypeIDField,
+  ValueTypes,
+} from '../../Utils/Types';
 
 function isValidationErrors(
   errors: ValidationError[],
@@ -103,7 +108,9 @@ export class IPAMController {
     const ipamValidator = await this.createSchema();
 
     const ipamFile = await readFile(filePath);
-    const ipamYAML = load(ipamFile.toString());
+    const ipamString = ipamFile.toString();
+
+    const ipamYAML = load(ipamString);
 
     if (ipamValidator(ipamYAML)) {
       try {
@@ -121,14 +128,50 @@ export class IPAMController {
           const validationError = processValidationErrors(err);
           const validationPath = validationError.path.join('.');
 
-          console.log(
-            `Error at ${validationPath} ${JSON.stringify(
-              validationError.target,
-            )}`,
-            validationError.constraints,
-          );
+          const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
 
-          console.log();
+          if (isContainerKey(className)) {
+            const idField = TypeIDField[className];
+
+            if (idField in validationError.target) {
+              const idValue = validationError.target[idField];
+
+              let expression: RegExp;
+              switch (className) {
+                case 'COMMUNITY':
+                  expression = new RegExp(
+                    `(?!communities:.+)id: ${idValue}$`,
+                    'gms',
+                  );
+              }
+
+              console.log(
+                `Finding a ${className} ${idField} with value of ${idValue}`,
+              );
+
+              const test = expression.exec(ipamString);
+
+              const line =
+                test.input.substr(0, test.index).match(/\n/g).length + 1;
+              class LineError extends Error {
+                public errorLine: number;
+
+                public constructor(errorLine: number) {
+                  super(
+                    `Invalid IPAM YAML path: ${filePath.toString()}
+                    message: ${JSON.stringify(
+                      validationError.constraints.validId,
+                    )}
+                    line: ${errorLine}`,
+                  );
+
+                  this.errorLine = errorLine;
+                }
+              }
+
+              throw new LineError(line);
+            }
+          }
         }
       }
     } else {

@@ -1,0 +1,15 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "eslint-compact",
+      "pattern": [
+        {
+          "regexp": ".*path:s(S+)s+message:s\"(.*)\"s+line:s(d)",
+          "file": 1,
+          "line": 3,
+          "message": 2
+        }
+      ]
+    }
+  ]
+}

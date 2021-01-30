@@ -40,3 +40,9 @@ export type ValueTypes = {
   NETWORK_HOST: NetworkHost;
   NETWORK: Network;
 };
+
+export function isContainerKey<T extends keyof typeof ContainerKeys>(
+  key: T,
+): boolean {
+  return Object.keys(ContainerKeys).includes(key);
+}

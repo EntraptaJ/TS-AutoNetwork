@@ -9,7 +9,7 @@ import { ValidationError } from 'class-validator';
 try {
   const ipamController = Container.get(IPAMController);
 
-  const config = await ipamController.loadIPAM('IPAM.yaml');
+  const config = await ipamController.loadIPAM('IPAM-Test.yaml');
 
   const toronto = config.communities.find(({ name }) => name === 'Toronto');
 

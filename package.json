@@ -41,6 +41,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
     "@k-foss/ts-esnode": "^1.7.0",
     "ajv": "^7.0.3",
     "ajv-class-validator": "^1.0.3",
