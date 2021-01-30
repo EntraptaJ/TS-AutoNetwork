@@ -61,14 +61,10 @@ export class Circuit implements IPAMCircuit {
   }
 
   public get sideACircuitLocation(): CircuitLocation {
-    return Container.get(
-      createContainerName('CIRCUIT_LOCATION', this.sideA.id),
-    );
+    return Container.get(createContainerName('CIRCUITLOCATION', this.sideA.id));
   }
 
   public get sideZCircuitLocation(): Circuit {
-    return Container.get(
-      createContainerName('CIRCUIT_LOCATION', this.sideZ.id),
-    );
+    return Container.get(createContainerName('CIRCUITLOCATION', this.sideZ.id));
   }
 }

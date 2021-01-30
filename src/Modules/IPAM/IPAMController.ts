@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // src/Modules/IPAM/IPAMController.ts
-import Ajv, { DefinedError, ValidateFunction } from 'ajv';
+import Ajv, { ValidateFunction } from 'ajv';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { PathLike } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
@@ -12,7 +12,7 @@ import { IPAM } from './IPAM';
 import { load } from 'js-yaml';
 import { defaultMetadataStorage } from 'class-transformer/storage';
 import { transformAndValidate } from 'class-transformer-validator';
-import { isInt, isNumber, ValidationError } from 'class-validator';
+import { ValidationError } from 'class-validator';
 import {
   ContainerKeys,
   isContainerKey,
@@ -127,10 +127,22 @@ export class IPAMController {
         if (isValidationErrors(err)) {
           const validationError = processValidationErrors(err);
 
+          console.log('Validation error', validationError);
+
           const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
+
+          console.log(
+            `Is className ${className} isContainerKey(className)`,
+            isContainerKey(className),
+          );
 
           if (isContainerKey(className)) {
             const idField = TypeIDField[className];
+
+            console.log(
+              `ID Field for ${className} is ${idField}`,
+              validationError.target,
+            );
 
             if (idField in validationError.target) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -138,13 +150,20 @@ export class IPAMController {
               // @ts-ignore
               const idValue = validationError.target[idField] as string;
 
-              const expression = new RegExp(
+              console.log(
+                `idValue: `,
+                idValue,
                 `((?<=${idField}: ${idValue}$\\s+)^\\s+(${validationError.property}: ${validationError.value}$))|((${validationError.property}: ${validationError.value}$)\\s+(?=^\\s+${idField}: ${idValue}$))`,
+              );
+
+              const expression = new RegExp(
+                `((?<=${idField}: ${idValue}$\\s+).*(${validationError.property}: ${validationError.value}$))|((${validationError.property}: ${validationError.value}$).*(?=^\\s+${idField}: ${idValue}$))`,
                 'gms',
               );
 
+              console.log(expression);
+
               const expressionResult = expression.exec(ipamString);
-              console.log(expressionResult);
 
               const line = expressionResult?.input
                 ?.substr(0, expressionResult?.index)
@@ -164,11 +183,7 @@ export class IPAMController {
         }
       }
     } else {
-      // The type cast is needed to allow user-defined keywords and errors
-      // You can extend this type to include your error types as needed.
-      for (const err of ipamValidator.errors as DefinedError[]) {
-        logger.log(LogMode.ERROR, `Config.yaml error: `, err);
-      }
+      console.log('HelloFucker');
     }
 
     throw new Error('Invalid config.yaml file');

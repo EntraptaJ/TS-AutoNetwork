@@ -74,9 +74,9 @@ export class IPAM {
 
   @ValidateNested({ each: true })
   @Transform((items: CircuitLocation[]) => {
-    items.map((item) => setContainer('CIRCUIT_LOCATION', item.id, item));
+    items.map((item) => setContainer('CIRCUITLOCATION', item.id, item));
 
-    return getManyContainer('CIRCUIT_LOCATION');
+    return getManyContainer('CIRCUITLOCATION');
   }, {})
   @Type(() => CircuitLocation)
   public circuitLocations: CircuitLocation[];

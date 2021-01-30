@@ -5,7 +5,7 @@ import { JSONSchema } from 'class-validator-jsonschema';
 import { Service } from 'typedi';
 import { setContainer } from '../../Utils/Containers';
 import { CommunitySite as IPAMCommunitySite } from '../IPAM/IPAMConfig.gen';
-import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
+import { SiteDevice } from '../SiteDevice/SiteDevice';
 import { SiteType } from './SiteType';
 
 @JSONSchema({
@@ -38,11 +38,11 @@ export class Site implements IPAMCommunitySite {
   public type?: SiteType;
 
   @ValidateNested({ each: true })
-  @Transform((items: NetworkDevice[]) => {
-    items.map((item) => setContainer('SITE_DEVICE', item.id, item));
+  @Transform((items: SiteDevice[]) => {
+    items.map((item) => setContainer('SITEDEVICE', item.id, item));
 
     return items;
   }, {})
-  @Type(() => NetworkDevice)
-  public devices: NetworkDevice[];
+  @Type(() => SiteDevice)
+  public devices: SiteDevice[];
 }

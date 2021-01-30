@@ -97,9 +97,9 @@ export class Network {
   @IsOptional()
   @ValidateNested({ each: true })
   @Transform((items: NetworkHost[]) => {
-    items.map((item) => setContainer('NETWORK_HOST', item.ip, item));
+    items.map((item) => setContainer('NETWORKHOST', item.ip, item));
 
-    return getManyContainer('NETWORK_HOST');
+    return getManyContainer('NETWORKHOST');
   }, {})
   @Type(() => NetworkHost)
   public hosts: NetworkHost[];

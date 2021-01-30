@@ -10,10 +10,10 @@ import { IsOptional, IsString } from 'class-validator';
 import { getManyContainer } from '../../Utils/Containers';
 
 @JSONSchema({
-  title: 'NetworkDevice',
+  title: 'SiteDevice',
 })
 @Service()
-export class NetworkDevice implements IPAMDevice {
+export class SiteDevice implements IPAMDevice {
   @IsString()
   @JSONSchema({
     description:
@@ -67,7 +67,7 @@ export class NetworkDevice implements IPAMDevice {
 
   public getNetworkHosts(): NetworkHost[] {
     if (!this.networkHosts) {
-      const networkHosts = getManyContainer('NETWORK_HOST');
+      const networkHosts = getManyContainer('NETWORKHOST');
 
       this.networkHosts = networkHosts.filter(
         (networkHost) => networkHost.device?.id === this.id,

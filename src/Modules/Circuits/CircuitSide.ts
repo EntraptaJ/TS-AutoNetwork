@@ -10,7 +10,7 @@ import { IsValidID } from '../../Utils/Validator';
 })
 export class CircuitSide {
   @IsString()
-  @IsValidID('CIRCUIT_LOCATION')
+  @IsValidID('CIRCUITLOCATION')
   @JSONSchema({
     description: 'Circuit ID referencing the CircuitLocation ID',
   })

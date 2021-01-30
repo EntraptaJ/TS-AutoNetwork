@@ -6,7 +6,7 @@ import Container, { Service } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
 import { IsValidID } from '../../Utils/Validator';
 import { Contact } from '../Contacts/Contact';
-import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
+import { SiteDevice } from '../SiteDevice/SiteDevice';
 import { Network } from './Network';
 import { NetworkHostDevice } from './NetworkHostDevice';
 
@@ -77,9 +77,9 @@ export class NetworkHost {
     return Container.get(createContainerName('NETWORK', this.parentNetworkId));
   }
 
-  public get coreDevice(): NetworkDevice | undefined {
+  public get coreDevice(): SiteDevice | undefined {
     if (this.device?.id) {
-      return Container.get(createContainerName('SITE_DEVICE', this.device.id));
+      return Container.get(createContainerName('SITEDEVICE', this.device.id));
     }
   }
 }

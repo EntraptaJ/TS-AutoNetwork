@@ -2,7 +2,7 @@
 import Container, { Inject, Service } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
 import { IPAM } from '../IPAM/IPAM';
-import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
+import { SiteDevice } from '../SiteDevice/SiteDevice';
 import { Site } from '../Sites/Site';
 
 @Service()
@@ -14,7 +14,7 @@ export class CircuitController {
     return this.ipam.communities.length;
   }
 
-  public rootDevice: NetworkDevice;
+  public rootDevice: SiteDevice;
 
   public rootSite: Site;
 
@@ -28,7 +28,7 @@ export class CircuitController {
     this.rootSite = Container.get(createContainerName('SITE', this.rootSiteId));
 
     this.rootDevice = Container.get(
-      createContainerName('SITE_DEVICE', this.rootDeviceId),
+      createContainerName('SITEDEVICE', this.rootDeviceId),
     );
   }
 
