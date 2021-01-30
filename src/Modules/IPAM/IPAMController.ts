@@ -35,6 +35,8 @@ interface ProcessedValidationError {
   constraints: {
     [type: string]: string;
   };
+  property: string;
+  value: string;
 }
 
 function processValidationErrors(
@@ -46,9 +48,12 @@ function processValidationErrors(
     }
 
     if (validationError.constraints && validationError.target) {
+      console.log(validationError);
       return {
         target: validationError.target as ValueTypes[keyof ValueTypes],
         constraints: validationError.constraints,
+        property: validationError.property,
+        value: validationError.value,
       };
     }
   }
@@ -133,9 +138,13 @@ export class IPAMController {
               // @ts-ignore
               const idValue = validationError.target[idField] as string;
 
-              const expression = new RegExp(`${idField}: ${idValue}$`, 'gms');
+              const expression = new RegExp(
+                `((?<=${idField}: ${idValue}$\\s+)^\\s+(${validationError.property}: ${validationError.value}$))|((${validationError.property}: ${validationError.value}$)\\s+(?=^\\s+${idField}: ${idValue}$))`,
+                'gms',
+              );
 
               const expressionResult = expression.exec(ipamString);
+              console.log(expressionResult);
 
               const line = expressionResult?.input
                 ?.substr(0, expressionResult?.index)
@@ -143,7 +152,7 @@ export class IPAMController {
 
               if (typeof line === 'number') {
                 throw new Error(
-                  `${filePath.toString()}: line ${line}, Error - ${
+                  `${filePath.toString()}: line ${line + 1}, Error - ${
                     validationError.constraints.validId
                   } (no-unused-vars)`,
                 );
