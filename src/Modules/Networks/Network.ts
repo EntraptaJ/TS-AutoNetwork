@@ -1,10 +1,14 @@
 // src/Modules/Networks/Network.ts
 import { Transform, Type } from 'class-transformer';
-import { IsIP, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  Validate,
+  ValidateNested,
+} from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Address4 } from 'ip-address';
 import Container, { Service } from 'typedi';
-import { logger, LogMode } from '../../Library/Logger';
 import {
   createContainerName,
   getManyContainer,
@@ -16,6 +20,7 @@ import { NetworkHost } from './NetworkHost';
 import { NetworkRange } from './NetworkRange';
 import { NetworkType } from './NetworkType';
 import { processNetworks } from '../IPAM/IPAM';
+import { ValidContactID } from '../Contacts/ContactIdValidator';
 
 @JSONSchema({
   title: 'Network',
@@ -29,7 +34,7 @@ export class Network {
    * Network Prefix
    */
 
-  @IsIP('4')
+  @IsString()
   @JSONSchema({
     description: 'Network Prefix',
   })
@@ -102,12 +107,14 @@ export class Network {
   }, {})
   @Type(() => NetworkHost)
   public hosts: NetworkHost[];
+
   /**
-   * TODO: Create validation to
+   * TODO: Create validation to enusre contactId is valid
    */
 
   @IsOptional()
   @IsString()
+  @Validate(ValidContactID)
   @JSONSchema({
     description: 'Reference Contact ID',
   })
@@ -139,9 +146,5 @@ export class Network {
     }
 
     return this.parentNetwork?.circuit;
-  }
-
-  public constructor(...params: unknown[]) {
-    logger.log(LogMode.DEBUG, `Network has been created: params: `, ...params);
   }
 }

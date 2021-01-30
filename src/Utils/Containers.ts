@@ -21,7 +21,7 @@ enum ContainerKeys {
   NETWORK = 'network-',
 }
 
-type ValueTypes = {
+export type ValueTypes = {
   CONTACT: Contact;
   COMMUNITY: Community;
   SITE_DEVICE: NetworkDevice;

@@ -7,7 +7,7 @@ import { Network } from '../Networks/Network';
 import { Community } from '../Communities/Community';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { ValidateNested } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { plainToClass, Transform, Type } from 'class-transformer';
 import { getManyContainer, setContainer } from '../../Utils/Containers';
 
 export function processNetworks(
@@ -49,19 +49,26 @@ export function processNetworks(
 export class IPAM {
   @ValidateNested({ each: true })
   @Transform((items: Contact[]) => {
-    items.map((item) => setContainer('CONTACT', item.id, item));
+    items.map((item) =>
+      setContainer('CONTACT', item.id, plainToClass(Contact, item)),
+    );
 
     return getManyContainer('CONTACT');
   }, {})
   @Type(() => Contact)
   public contacts: Contact[];
 
-  @ValidateNested({ each: true })
-  @Transform((items: Community[]) => {
-    items.map((item) => setContainer('COMMUNITY', item.id, item));
+  @ValidateNested({ each: true, always: true })
+  @Transform(
+    (items: Community[]) => {
+      items.map((item) => setContainer('COMMUNITY', item.id, item));
 
-    return getManyContainer('COMMUNITY');
-  }, {})
+      return getManyContainer('COMMUNITY');
+    },
+    {
+      toClassOnly: true,
+    },
+  )
   @Type(() => Community)
   public communities: Community[];
 

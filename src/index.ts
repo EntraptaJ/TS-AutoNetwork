@@ -4,16 +4,20 @@ import { timeout } from './Utils/timeout';
 import { logger, LogMode } from './Library/Logger';
 import Container from 'typedi';
 import { IPAMController } from './Modules/IPAM/IPAMController';
+import { ValidationError } from 'class-validator';
 
-const ipamController = Container.get(IPAMController);
+try {
+  const ipamController = Container.get(IPAMController);
 
-const config = await ipamController.loadIPAM('IPAM.yaml');
+  const config = await ipamController.loadIPAM('IPAM.yaml');
 
-const toronto = config.communities.find(({ name }) => name === 'Toronto');
+  const toronto = config.communities.find(({ name }) => name === 'Toronto');
 
-console.log(toronto);
-
-console.log(config.contacts);
+  console.log(toronto);
+} catch (err) {
+  const test = err as ValidationError[];
+  console.log('Error');
+}
 
 // await ipamController.saveSchema();
 
@@ -171,6 +175,10 @@ async function sayHello(name = 'John'): Promise<void> {
 }
 
 logger.log(LogMode.INFO, `Starting TS-Core`);
+
+setInterval(() => {
+  console.log('Tester');
+}, 5000);
 
 await sayHello('K-FOSS');
 

@@ -1,9 +1,8 @@
 // src/Modules/Networks/NetworkHost.ts
 import { Type } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Validate } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import Container, { Service } from 'typedi';
-import { logger, LogMode } from '../../Library/Logger';
 import { createContainerName } from '../../Utils/Containers';
 import { Contact } from '../Contacts/Contact';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
@@ -48,7 +47,7 @@ export class NetworkHost {
   public parentNetworkId: string;
 
   /**
-   * Unique Contact Id reference
+   * TODO: Validate Contact ID to ensure it is valid
    */
 
   @IsOptional()
@@ -80,9 +79,5 @@ export class NetworkHost {
     if (this.device?.id) {
       return Container.get(createContainerName('SITE_DEVICE', this.device.id));
     }
-  }
-
-  public constructor(...params: unknown[]) {
-    logger.log(LogMode.DEBUG, `created NetworkHost: params: `, ...params);
   }
 }
