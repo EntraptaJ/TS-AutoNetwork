@@ -6,14 +6,14 @@ communities:
       - id: tor.c1
         name: Toronto Cabniet 12
         devices:
-        - id: tor.c1.rt1
-          name: Torotno Cabinet 1 Router 1
+          - id: tor.c1.rt1
+            name: Torotno Cabinet 1 Router 1
 
       - id: tor.c2
         name: Toronto Cabniet 2
         devices:
-        - id: tor.c2.rt1
-          name: Torotno Cabinet 2 Router 1
+          - id: tor.c2.rt1
+            name: Torotno Cabinet 2 Router 1
 
 circuits:
   - id: tor.clink

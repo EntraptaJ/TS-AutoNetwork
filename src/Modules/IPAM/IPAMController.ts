@@ -127,22 +127,10 @@ export class IPAMController {
         if (isValidationErrors(err)) {
           const validationError = processValidationErrors(err);
 
-          console.log('Validation error', validationError);
-
           const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
-
-          console.log(
-            `Is className ${className} isContainerKey(className)`,
-            isContainerKey(className),
-          );
 
           if (isContainerKey(className)) {
             const idField = TypeIDField[className];
-
-            console.log(
-              `ID Field for ${className} is ${idField}`,
-              validationError.target,
-            );
 
             if (idField in validationError.target) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -150,10 +138,10 @@ export class IPAMController {
               // @ts-ignore
               const idValue = validationError.target[idField] as string;
 
-              console.log(
-                `idValue: `,
-                idValue,
-                `((?<=${idField}: ${idValue}$\\s+)^\\s+(${validationError.property}: ${validationError.value}$))|((${validationError.property}: ${validationError.value}$)\\s+(?=^\\s+${idField}: ${idValue}$))`,
+              // https://regex101.com/r/Alxmka/1
+              const newExpression = new RegExp(
+                `((?<=(?<id>(?:${idField}: ${idValue})\\s+))\\s+(?<${validationError.property}>${validationError.property}: ${validationError.value}))|((?<${validationError.property}Second>${validationError.property}: ${validationError.value})(?=\\k<id>))`,
+                `gms`,
               );
 
               const expression = new RegExp(
@@ -161,13 +149,18 @@ export class IPAMController {
                 'gms',
               );
 
-              console.log(expression);
+              const array = [...ipamString.matchAll(newExpression)];
 
-              const expressionResult = expression.exec(ipamString);
-
-              const line = expressionResult?.input
-                ?.substr(0, expressionResult?.index)
+              const firstMatch = array[0];
+              const line = firstMatch.input
+                ?.substr(0, firstMatch.index)
                 .match(/\n/g)?.length;
+
+              // const expressionResult = expression.exec(ipamString);
+
+              // const line = expressionResult?.input
+              //   ?.substr(0, expressionResult?.index)
+              //   .match(/\n/g)?.length;
 
               if (typeof line === 'number') {
                 throw new Error(
