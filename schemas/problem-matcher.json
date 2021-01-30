@@ -7,6 +7,7 @@
           "regexp": "^(.+):\\sline\\s(\\d+),\\s(Error|Warning|Info)\\s-\\s(.+)\\s\\((.+)\\)$",
           "file": 1,
           "line": 2,
+          "column": 2,
           "severity": 3,
           "message": 4,
           "code": 5
