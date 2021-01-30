@@ -48,7 +48,7 @@ networks:
           - ip: 1.0.0.1
             description: Toronto Cabniet 1
             contactId: tor.todo1
-            deviceId: tor.c1.rt0
+            deviceId: tor.c1.rt1
             deviceInterface: TenGigE0/0/0/1
           - ip: 1.0.0.2
             description: Toronto Cabniet 2
