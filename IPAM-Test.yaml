@@ -1,7 +1,7 @@
 communities:
   - name: Toronto
     id: tor
-    contactId: tor.invalid2
+    contactId: tor.todo1
     sites:
       - id: tor.c1
         name: Toronto Cabniet 12
