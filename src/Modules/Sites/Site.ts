@@ -3,7 +3,6 @@ import { Transform, Type } from 'class-transformer';
 import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Service } from 'typedi';
-import { logger, LogMode } from '../../Library/Logger';
 import { setContainer } from '../../Utils/Containers';
 import { CommunitySite as IPAMCommunitySite } from '../IPAM/IPAMConfig.gen';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';

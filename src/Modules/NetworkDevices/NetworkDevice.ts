@@ -1,5 +1,5 @@
 // src/Modules/NetworkDevices/NetworkDevice.ts
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
 import { Device as IPAMDevice } from '../IPAM/IPAMConfig.gen';
 import { NetworkHost } from '../Networks/NetworkHost';
 import { NetworkDeviceInterface } from './NetworkDeviceInterface';
