@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // src/Modules/IPAM/IPAMController.ts
 import Ajv, { DefinedError, ValidateFunction } from 'ajv';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
@@ -11,7 +12,7 @@ import { IPAM } from './IPAM';
 import { load } from 'js-yaml';
 import { defaultMetadataStorage } from 'class-transformer/storage';
 import { transformAndValidate } from 'class-transformer-validator';
-import { ValidationError } from 'class-validator';
+import { isInt, isNumber, ValidationError } from 'class-validator';
 import {
   ContainerKeys,
   isContainerKey,
@@ -34,26 +35,20 @@ interface ProcessedValidationError {
   constraints: {
     [type: string]: string;
   };
-  path: string[];
 }
 
 function processValidationErrors(
   validationErrors: ValidationError[],
-  path: string[] = [],
 ): ProcessedValidationError {
   for (const validationError of validationErrors) {
     if (validationError.children.length > 0) {
-      return processValidationErrors(validationError.children, [
-        ...path,
-        validationError.property,
-      ]);
+      return processValidationErrors(validationError.children);
     }
 
     if (validationError.constraints && validationError.target) {
       return {
         target: validationError.target as ValueTypes[keyof ValueTypes],
         constraints: validationError.constraints,
-        path,
       };
     }
   }
@@ -126,7 +121,6 @@ export class IPAMController {
       } catch (err) {
         if (isValidationErrors(err)) {
           const validationError = processValidationErrors(err);
-          const validationPath = validationError.path.join('.');
 
           const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
 
@@ -134,38 +128,28 @@ export class IPAMController {
             const idField = TypeIDField[className];
 
             if (idField in validationError.target) {
-              const idValue = validationError.target[idField];
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const idValue = validationError.target[idField] as string;
 
-              let expression: RegExp;
-              switch (className) {
-                case 'COMMUNITY':
-                  expression = new RegExp(
-                    `(?!communities:.+)id: ${idValue}$`,
-                    'gms',
-                  );
+              const expression = new RegExp(`${idField}: ${idValue}$`, 'gms');
+
+              const expressionResult = expression.exec(ipamString);
+
+              const line = expressionResult?.input
+                ?.substr(0, expressionResult?.index)
+                .match(/\n/g)?.length;
+
+              if (typeof line === 'number') {
+                throw new Error(
+                  `${filePath.toString()}: line ${line}, Error - ${
+                    validationError.constraints.validId
+                  } (no-unused-vars)`,
+                );
               }
 
-              console.log(
-                `Finding a ${className} ${idField} with value of ${idValue}`,
-              );
-
-              const test = expression.exec(ipamString);
-
-              const line =
-                test.input.substr(0, test.index).match(/\n/g).length + 1;
-              class LineError extends Error {
-                public errorLine: number;
-
-                public constructor(errorLine: number) {
-                  super(
-                    `${filePath}: line ${line}, col 11, Error - ${validationError.constraints.validId} (no-unused-vars)`,
-                  );
-
-                  this.errorLine = errorLine;
-                }
-              }
-
-              throw new LineError(line);
+              throw new Error('Error while parsing validation error');
             }
           }
         }
