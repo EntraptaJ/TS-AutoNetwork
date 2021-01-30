@@ -36,7 +36,23 @@ export class NetworkHost {
 
   @IsOptional()
   @Type(() => NetworkHostDevice)
+  @JSONSchema({
+    deprecated: true,
+  })
   public device?: NetworkHostDevice;
+
+  @IsOptional()
+  @IsValidID('SITEDEVICE')
+  @JSONSchema({
+    description: 'Site Device Reference ID',
+  })
+  public deviceId?: string;
+
+  @IsOptional()
+  @JSONSchema({
+    description: 'Site Device Interface',
+  })
+  public deviceInterface: string;
 
   @IsOptional()
   @IsString()

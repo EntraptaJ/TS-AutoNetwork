@@ -4,11 +4,7 @@ import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Address4 } from 'ip-address';
 import Container, { Service } from 'typedi';
-import {
-  createContainerName,
-  getManyContainer,
-  setContainer,
-} from '../../Utils/Containers';
+import { createContainerName } from '../../Utils/Containers';
 import { Circuit } from '../Circuits/Circuit';
 import { Contact } from '../Contacts/Contact';
 import { NetworkHost } from './NetworkHost';
@@ -96,11 +92,6 @@ export class Network {
 
   @IsOptional()
   @ValidateNested({ each: true })
-  @Transform((items: NetworkHost[]) => {
-    items.map((item) => setContainer('NETWORKHOST', item.ip, item));
-
-    return getManyContainer('NETWORKHOST');
-  }, {})
   @Type(() => NetworkHost)
   public hosts: NetworkHost[];
 
