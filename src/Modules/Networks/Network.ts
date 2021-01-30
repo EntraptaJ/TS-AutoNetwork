@@ -1,11 +1,6 @@
 // src/Modules/Networks/Network.ts
 import { Transform, Type } from 'class-transformer';
-import {
-  IsOptional,
-  IsString,
-  Validate,
-  ValidateNested,
-} from 'class-validator';
+import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Address4 } from 'ip-address';
 import Container, { Service } from 'typedi';
@@ -20,7 +15,7 @@ import { NetworkHost } from './NetworkHost';
 import { NetworkRange } from './NetworkRange';
 import { NetworkType } from './NetworkType';
 import { processNetworks } from '../IPAM/IPAM';
-import { ValidContactID } from '../Contacts/ContactIdValidator';
+import { IsValidID } from '../../Utils/Validator';
 
 @JSONSchema({
   title: 'Network',
@@ -67,6 +62,7 @@ export class Network {
    */
   @IsOptional()
   @IsString()
+  @IsValidID('CIRCUIT')
   @JSONSchema({
     description: 'Reference Circuit ID',
   })
@@ -114,7 +110,7 @@ export class Network {
 
   @IsOptional()
   @IsString()
-  @Validate(ValidContactID)
+  @IsValidID('CONTACT')
   @JSONSchema({
     description: 'Reference Contact ID',
   })

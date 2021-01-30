@@ -12,14 +12,16 @@ import { load } from 'js-yaml';
 import { defaultMetadataStorage } from 'class-transformer/storage';
 import { transformAndValidate } from 'class-transformer-validator';
 import { ValidationError } from 'class-validator';
-import { ValueTypes } from '../../Utils/Containers';
+import { ValueTypes } from '../../Utils/Types';
 
-function isValidationErrors(errors: unknown[]): errors is ValidationError[] {
+function isValidationErrors(
+  errors: ValidationError[],
+): errors is ValidationError[] {
   if ('property' in errors[0]) {
     return true;
   }
 
-  return undefined;
+  return false;
 }
 
 interface ProcessedValidationError {

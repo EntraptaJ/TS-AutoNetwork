@@ -4,9 +4,9 @@ import { createContainerName, setContainer } from '../../Utils/Containers';
 import { Site } from '../Sites/Site';
 import { Contact } from '../Contacts/Contact';
 import { JSONSchema } from 'class-validator-jsonschema';
-import { IsString, Validate, ValidateNested } from 'class-validator';
+import { IsString, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { ValidContactID } from '../Contacts/ContactIdValidator';
+import { IsValidID } from '../../Utils/Validator';
 
 export const CommunitiesToken = new Token<string>('communities');
 
@@ -32,10 +32,8 @@ export class Community {
   /**
    * TODO: Setup validation to ensure community ID exists
    */
-  @Validate(ValidContactID, {
-    message: 'Title is too short or long!',
-  })
   @IsString()
+  @IsValidID('CONTACT')
   @JSONSchema({
     description: 'Unique contact ID reference',
   })

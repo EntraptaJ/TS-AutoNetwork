@@ -1,9 +1,10 @@
 // src/Modules/Networks/NetworkHost.ts
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, Validate } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import Container, { Service } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
+import { IsValidID } from '../../Utils/Validator';
 import { Contact } from '../Contacts/Contact';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
 import { Network } from './Network';
@@ -52,6 +53,7 @@ export class NetworkHost {
 
   @IsOptional()
   @IsString()
+  @IsValidID('CONTACT')
   @JSONSchema({
     description: 'Reference ID for Contact',
   })

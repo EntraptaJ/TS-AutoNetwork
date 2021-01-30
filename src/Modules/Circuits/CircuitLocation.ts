@@ -3,6 +3,7 @@ import { IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import Container, { Service } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
+import { IsValidID } from '../../Utils/Validator';
 import { Community } from '../Communities/Community';
 import { CommunityCircuitSpeed } from '../CommunityCircuits/CommunityCircuitSpeed';
 import { CircuitLocation as IPAMCircuitLocation } from '../IPAM/IPAMConfig.gen';
@@ -37,6 +38,7 @@ export class CircuitLocation
   public provider: string;
 
   @IsString()
+  @IsValidID('COMMUNITY')
   @JSONSchema({
     description: 'Reference ID of the Community the circuit is within',
   })

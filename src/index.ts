@@ -16,7 +16,7 @@ try {
   console.log(toronto);
 } catch (err) {
   const test = err as ValidationError[];
-  console.log('Error');
+  console.log('Error', test);
 }
 
 // await ipamController.saveSchema();
