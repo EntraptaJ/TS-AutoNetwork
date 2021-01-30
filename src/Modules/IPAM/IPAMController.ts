@@ -158,11 +158,7 @@ export class IPAMController {
 
                 public constructor(errorLine: number) {
                   super(
-                    `Invalid IPAM YAML path: ${filePath.toString()}
-                    message: ${JSON.stringify(
-                      validationError.constraints.validId,
-                    )}
-                    line: ${errorLine}`,
+                    `${filePath}: line ${line}, col 11, Error - ${validationError.constraints.validId} (no-unused-vars)`,
                   );
 
                   this.errorLine = errorLine;

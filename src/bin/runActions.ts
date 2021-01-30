@@ -21,9 +21,5 @@ try {
   const config = await ipamController.loadIPAM('IPAM-Test.yaml');
   logger.log(LogMode.INFO, `Config loaded`, config);
 } catch (err) {
-  if ('errorLine' in err) {
-    logger.log(LogMode.ERROR, 'Error on line: ', err.errorLine);
-  }
-
   console.log(err);
 }
