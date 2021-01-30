@@ -7,9 +7,9 @@
           "regexp": "^(.+):\\sline\\s(\\d+),\\s(Error|Warning|Info)\\s-\\s(.+)\\s\\((.+)\\)$",
           "file": 1,
           "line": 2,
-          "severity": 4,
-          "message": 5,
-          "code": 6
+          "severity": 3,
+          "message": 4,
+          "code": 5
         }
       ]
     }
