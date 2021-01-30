@@ -2,15 +2,33 @@
 import 'reflect-metadata';
 import { timeout } from './Utils/timeout';
 import { logger, LogMode } from './Library/Logger';
-import { ipamConfigController } from './Modules/IPAM/IPAMConfigController';
 import Container from 'typedi';
+import { IPAMController } from './Modules/IPAM/IPAMController';
+
+const ipamController = Container.get(IPAMController);
+
+const config = await ipamController.loadIPAM('IPAM.yaml');
+
+const toronto = config.communities.find(({ name }) => name === 'Toronto');
+
+console.log(toronto);
+
+console.log(config.contacts);
+
+// await ipamController.saveSchema();
+
+/*
+import { ipamConfigController } from './Modules/IPAM/IPAMConfigController';
+import Container, { Service } from 'typedi';
 import { NetworkController } from './Modules/Networks/NetworkController';
 import { Address4 } from 'ip-address';
 import { getSmallestSubnet } from './Utils/Networks';
+import { CircuitController } from './Modules/Circuits/CircuitController';
 
 const ipam = await ipamConfigController.loadFile('IPAM.yaml');
+Container.set('ipam', ipam);
 
-const communityCount = ipam.communities.length;
+/* const communityCount = ipam.communities.length;
 const totalCommunity = 80;
 
 console.log(
@@ -19,33 +37,13 @@ console.log(
   } remaining `,
 );
 
-const toronto = ipam.communities.find(({ id }) => id === 'tor');
+Container.set('totalCommunities', 80);
+Container.set('rootSiteId', 'tor.c74');
+Container.set('rootDeviceId', 'tor.c74.rt1');
 
-const c74 = toronto?.sites.find(({ id }) => id === 'tor.c74');
+const circuitController = Container.get(CircuitController);
 
-const coreRouter = c74?.devices.find(({ id }) => id === 'tor.c74.rt1');
-
-const networkHosts = coreRouter?.getNetworkHosts();
-
-if (networkHosts) {
-  for (const networkHost of networkHosts) {
-    const circuit = networkHost.parentNetwork.circuit;
-
-    if (networkHost.device?.interface && circuit?.id) {
-      console.log(
-        `${
-          networkHost.device.interface
-        } circuit run at ${circuit
-          .parsedCircuitSpeed()
-          .convertTo('Mb')} for community: ${
-          circuit.sideACircuitLocation.communuity.name
-        }`,
-      );
-    } else {
-      console.log(`No device Interface or circuit`, networkHost);
-    }
-  }
-}
+circuitController.listCircuits();
 
 const networkController = Container.get(NetworkController);
 
@@ -53,6 +51,12 @@ const ddosIP = new Address4('66.165.192.189/32');
 const networks = networkController.findIP(ddosIP);
 
 const device = getSmallestSubnet(networks);
+
+for (const service of Container.globalInstance.services as Service[]) {
+  console.log(service);
+}
+
+console.log(); */
 
 /* if (device.circuit?.speed) {
   for (const network of device.circuit.networks) {

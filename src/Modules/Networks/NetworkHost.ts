@@ -1,25 +1,48 @@
 // src/Modules/Networks/NetworkHost.ts
+import { Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+import { JSONSchema } from 'class-validator-jsonschema';
 import Container, { Service } from 'typedi';
+import { logger, LogMode } from '../../Library/Logger';
 import { createContainerName } from '../../Utils/Containers';
 import { Contact } from '../Contacts/Contact';
-import {
-  NetworkDeviceLink,
-  NetworkHost as IPAMNetworkHost,
-} from '../IPAM/IPAMConfig.gen';
 import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
 import { Network } from './Network';
+import { NetworkHostDevice } from './NetworkHostDevice';
 
+@JSONSchema({
+  title: 'NetworkHost',
+  description: 'TODO',
+  additionalProperties: false,
+})
 @Service()
-export class NetworkHost implements IPAMNetworkHost {
+export class NetworkHost {
+  @IsString()
+  @JSONSchema({
+    description: 'IP Address for this host entry',
+  })
   public ip: string;
 
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Friendly Description for the Network Host',
+  })
+  public description?: string;
+
   /**
-   * Friendly Description for the Network Host
+   * TODO: Create Network Device Link Schema
    */
-  public description: string;
 
-  public device?: NetworkDeviceLink;
+  @IsOptional()
+  @Type(() => NetworkHostDevice)
+  public device?: NetworkHostDevice;
 
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Friendly Description for the Network Host',
+  })
   public hostname?: string;
 
   public parentNetworkId: string;
@@ -27,6 +50,12 @@ export class NetworkHost implements IPAMNetworkHost {
   /**
    * Unique Contact Id reference
    */
+
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Reference ID for Contact',
+  })
   public contactId?: string;
 
   /**
@@ -53,7 +82,7 @@ export class NetworkHost implements IPAMNetworkHost {
     }
   }
 
-  public constructor(options: Partial<NetworkHost>) {
-    Object.assign(this, options);
+  public constructor(...params: unknown[]) {
+    logger.log(LogMode.DEBUG, `created NetworkHost: params: `, ...params);
   }
 }

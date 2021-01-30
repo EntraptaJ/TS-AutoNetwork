@@ -1,12 +1,18 @@
 // src/Modules/Networks/NetworkController.ts
-import { Inject, Service } from 'typedi';
-import { Network } from './Network';
 import { Address4 } from 'ip-address';
+import Container, { Service } from 'typedi';
+import { createContainerName } from '../../Utils/Containers';
+import { Network } from './Network';
 
 @Service()
 export class NetworkController {
-  @Inject('networks')
-  public networks: Network[];
+  public get networks(): Network[] {
+    const networkIds = Container.getMany<string>('network');
+
+    return networkIds.map((networkId) =>
+      Container.get(createContainerName('NETWORK', networkId)),
+    );
+  }
 
   public findIP(ipAddress: Address4): Network[] {
     return this.networks.filter((network) =>

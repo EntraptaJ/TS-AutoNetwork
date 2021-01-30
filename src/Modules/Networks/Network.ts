@@ -1,17 +1,38 @@
 // src/Modules/Networks/Network.ts
+import { Transform, Type } from 'class-transformer';
+import { IsIP, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { JSONSchema } from 'class-validator-jsonschema';
+import { Address4 } from 'ip-address';
 import Container, { Service } from 'typedi';
-import { createContainerName } from '../../Utils/Containers';
+import { logger, LogMode } from '../../Library/Logger';
+import {
+  createContainerName,
+  getManyContainer,
+  setContainer,
+} from '../../Utils/Containers';
 import { Circuit } from '../Circuits/Circuit';
 import { Contact } from '../Contacts/Contact';
-import { Network as IPAMNetwork } from '../IPAM/IPAMConfig.gen';
 import { NetworkHost } from './NetworkHost';
-import { Address4 } from 'ip-address';
+import { NetworkRange } from './NetworkRange';
+import { NetworkType } from './NetworkType';
+import { processNetworks } from '../IPAM/IPAM';
 
+@JSONSchema({
+  title: 'Network',
+  description: 'Network object',
+  additionalProperties: false,
+  required: ['prefix'],
+})
 @Service()
-export class Network implements Omit<IPAMNetwork, 'networks'> {
+export class Network {
   /**
    * Network Prefix
    */
+
+  @IsIP('4')
+  @JSONSchema({
+    description: 'Network Prefix',
+  })
   public prefix: string;
 
   public get IPv4(): Address4 {
@@ -21,16 +42,43 @@ export class Network implements Omit<IPAMNetwork, 'networks'> {
   /**
    * Friendly description
    */
-  public description: string;
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Description for this network',
+  })
+  public description?: string;
+
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Usage/type for this network',
+    enum: Object.values(NetworkType),
+  })
+  public type: NetworkType;
 
   /**
-   * Circuit Identifier
+   * TODO: Create validation to
    */
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Reference Circuit ID',
+  })
   public circuitId?: string;
 
-  public get networks(): Network[] | undefined {
-    return Container.getMany(`networks-${this.prefix}`);
-  }
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Transform((items: Network[]) => {
+    return processNetworks(items);
+  }, {})
+  @Type(() => Network)
+  public networks: Network[];
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => NetworkRange)
+  public ranges: NetworkRange[];
 
   /**
    * Unique Parent Network Id
@@ -45,16 +93,34 @@ export class Network implements Omit<IPAMNetwork, 'networks'> {
     }
   }
 
-  public get hosts(): NetworkHost[] {
-    return Container.getMany(`networkHost-${this.prefix}`);
-  }
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Transform((items: NetworkHost[]) => {
+    items.map((item) => setContainer('NETWORK_HOST', item.ip, item));
 
+    return getManyContainer('NETWORK_HOST');
+  }, {})
+  @Type(() => NetworkHost)
+  public hosts: NetworkHost[];
   /**
-   * Contact Object Identifier
+   * TODO: Create validation to
    */
+
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Reference Contact ID',
+  })
   public contactId?: string;
 
-  public free?: boolean;
+  @IsOptional()
+  @IsString({
+    each: true,
+  })
+  @JSONSchema({
+    description: 'Authorative name server to forward reverse DNS requests to',
+  })
+  public nsServers: string[];
 
   public get contact(): Contact | undefined {
     if (this.contactId) {
@@ -75,7 +141,7 @@ export class Network implements Omit<IPAMNetwork, 'networks'> {
     return this.parentNetwork?.circuit;
   }
 
-  public constructor(options: Partial<Network>) {
-    Object.assign(this, options);
+  public constructor(...params: unknown[]) {
+    logger.log(LogMode.DEBUG, `Network has been created: params: `, ...params);
   }
 }

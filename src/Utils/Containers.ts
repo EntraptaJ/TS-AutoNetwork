@@ -47,13 +47,21 @@ export function setContainer<T extends keyof typeof ContainerKeys>(
 ): void {
   const containerName = createContainerName(key, id);
 
-  if (key === 'NETWORK_HOST') {
-    container.set({
-      id: key,
-      value,
-      multiple: true,
-    });
-  }
-
   container.set(containerName, value);
+  container.set({
+    id: key,
+    value: id,
+    multiple: true,
+  });
+}
+
+export function getManyContainer<T extends keyof typeof ContainerKeys>(
+  key: T,
+  container = Container,
+): ValueTypes[T][] {
+  const valueIds = container.getMany<string>(key);
+
+  return valueIds.map((valueId) =>
+    container.get(createContainerName(key, valueId)),
+  );
 }

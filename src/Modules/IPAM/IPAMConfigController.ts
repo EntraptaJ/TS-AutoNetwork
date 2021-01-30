@@ -121,7 +121,7 @@ export class IPAMConfigController {
       Container.set({
         id: `networkHost-${parentNetwork.prefix}`,
         multiple: true,
-        value: networkHost,
+        value: networkHost.ip,
       });
 
       setContainer('NETWORK_HOST', networkHost.ip, networkHost);
@@ -164,13 +164,19 @@ export class IPAMConfigController {
           Container.set({
             id: `networks-${parentNetwork.prefix}`,
             multiple: true,
-            value: network,
+            value: network.prefix,
           });
         }
 
         if (hostsValue) {
           this.processNetworkHosts(hostsValue, network);
         }
+
+        Container.set({
+          id: 'network',
+          value: network.prefix,
+          multiple: true,
+        });
 
         setContainer('NETWORK', network.prefix, network);
 
@@ -207,8 +213,6 @@ export class IPAMConfigController {
 
       const circuits = this.processCircuits(ipamConfigFile.circuits);
       const networks = this.processNetworks(ipamConfigFile.networks);
-
-      Container.set('networks', networks);
 
       return new IPAM({
         circuitLocations,
