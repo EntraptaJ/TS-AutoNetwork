@@ -3,14 +3,6 @@ import Container from 'typedi';
 import { logger, LogMode } from '../Library/Logger';
 import { IPAMController } from '../Modules/IPAM/IPAMController';
 
-function isError(obj: Error): obj is Error {
-  if ('message' in obj) {
-    return true;
-  }
-
-  return false;
-}
-
 try {
   const ipamController = Container.get(IPAMController);
 
@@ -21,7 +13,7 @@ try {
     console.error(err);
   }
 
-  // process.exit(1);
+  process.exit(1);
 }
 
-setInterval(() => console.log('Fucker'), 5000);
+// setInterval(() => console.log('Fucker'), 5000);
