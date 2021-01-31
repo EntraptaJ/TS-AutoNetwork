@@ -43,7 +43,7 @@ contacts:
 networks:
   - prefix: 1.0.0.0/23
     networks:
-      - prefix: 1.1.0.0/30
+      - prefix: 1.0.0.0/30
         hosts:
           - ip: 1.0.0.1
             description: Toronto Cabniet 1
