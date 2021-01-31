@@ -11,6 +11,10 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "strictPropertyInitialization": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "useDefineForClassFields": true,
 
     // Source Maps
     "inlineSourceMap": true,

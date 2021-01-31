@@ -1,17 +1,22 @@
 // src/Modules/Networks/Network.ts
 import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  Validate,
+  ValidateNested,
+} from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Address4 } from 'ip-address';
 import Container, { Service } from 'typedi';
-import { createContainerName } from '../../Utils/Containers';
+import { createContainerName, setContainer } from '../../Utils/Containers';
 import { Circuit } from '../Circuits/Circuit';
 import { Contact } from '../Contacts/Contact';
 import { NetworkHost } from './NetworkHost';
 import { NetworkRange } from './NetworkRange';
 import { NetworkType } from './NetworkType';
-import { processNetworks } from '../IPAM/IPAM';
 import { IsValidID } from '../../Utils/Validator';
+import { ValidPrefix, ValidSubnet } from './PrefixValidator';
 
 @JSONSchema({
   title: 'Network',
@@ -26,12 +31,14 @@ export class Network {
    */
 
   @IsString()
+  @Validate(ValidPrefix)
   @JSONSchema({
     description: 'Network Prefix',
   })
   public prefix: string;
 
   public get IPv4(): Address4 {
+    console.log('Creating IPv4', this.prefix);
     return new Address4(this.prefix);
   }
 
@@ -53,12 +60,18 @@ export class Network {
   })
   public type: NetworkType;
 
-  /**
-   * TODO: Create validation to
-   */
   @IsOptional()
   @IsString()
   @IsValidID('CIRCUIT')
+  @Transform((circuitId: string, network: Network) => {
+    Container.set({
+      id: `circuitNetworks-${circuitId}`,
+      multiple: true,
+      value: network.prefix,
+    });
+
+    return circuitId;
+  })
   @JSONSchema({
     description: 'Reference Circuit ID',
   })
@@ -66,9 +79,15 @@ export class Network {
 
   @IsOptional()
   @ValidateNested({ each: true })
-  @Transform((items: Network[]) => {
-    return processNetworks(items);
-  }, {})
+  @Transform((networks: Network[], parentNetwork: Network) => {
+    return networks.map((item) => {
+      item.parentNetworkId = parentNetwork.prefix;
+
+      setContainer('NETWORK', item.prefix, item);
+
+      return Container.get(createContainerName('NETWORK', item.prefix));
+    });
+  })
   @Type(() => Network)
   public networks: Network[];
 
@@ -77,9 +96,12 @@ export class Network {
   @Type(() => NetworkRange)
   public ranges: NetworkRange[];
 
-  /**
-   * Unique Parent Network Id
-   */
+  @IsOptional()
+  @Validate(ValidSubnet, {
+    context: {
+      locateField: false,
+    },
+  })
   public parentNetworkId?: string;
 
   public get parentNetwork(): Network | undefined {
@@ -94,10 +116,6 @@ export class Network {
   @ValidateNested({ each: true })
   @Type(() => NetworkHost)
   public hosts: NetworkHost[];
-
-  /**
-   * TODO: Create validation to enusre contactId is valid
-   */
 
   @IsOptional()
   @IsString()

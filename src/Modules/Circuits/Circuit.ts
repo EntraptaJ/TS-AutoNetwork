@@ -5,7 +5,6 @@ import { JSONSchema } from 'class-validator-jsonschema';
 import Container, { Service } from 'typedi';
 import xbytes from 'xbytes';
 import { createContainerName } from '../../Utils/Containers';
-import { Circuit as IPAMCircuit } from '../IPAM/IPAMConfig.gen';
 import { Network } from '../Networks/Network';
 import { CircuitLocation } from './CircuitLocation';
 import { CircuitSide } from './CircuitSide';
@@ -16,7 +15,7 @@ import { CircuitSide } from './CircuitSide';
   additionalProperties: false,
 })
 @Service()
-export class Circuit implements IPAMCircuit {
+export class Circuit {
   @IsString()
   @JSONSchema({
     description: 'Unique Circuit ID used for refences from other objects',

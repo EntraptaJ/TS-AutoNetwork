@@ -13,7 +13,7 @@ import { getManyContainer, setContainer } from '../../Utils/Containers';
 export function processNetworks(
   networks: Network[],
   parentNetwork?: Network,
-): Network[] {
+): void[] {
   return networks.flatMap((network) => {
     if (network.circuitId) {
       Container.set({
@@ -23,10 +23,6 @@ export function processNetworks(
       });
     }
 
-    const subNetworks = network.networks
-      ? processNetworks(network.networks, network)
-      : [];
-
     if (parentNetwork) {
       Container.set({
         id: `networks-${parentNetwork.prefix}`,
@@ -35,9 +31,7 @@ export function processNetworks(
       });
     }
 
-    setContainer('NETWORK', network.prefix, network);
-
-    return [network, ...subNetworks];
+    return setContainer('NETWORK', network.prefix, network);
   });
 }
 
@@ -92,7 +86,9 @@ export class IPAM {
 
   @ValidateNested({ each: true })
   @Transform((items: Network[]) => {
-    return processNetworks(items);
+    items.map((item) => setContainer('NETWORK', item.prefix, item));
+
+    return getManyContainer('NETWORK');
   }, {})
   @Type(() => Network)
   public networks: Network[];

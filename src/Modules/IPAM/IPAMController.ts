@@ -37,6 +37,8 @@ interface ProcessedValidationError {
   };
   property: string;
   value: string;
+
+  contexts?: { [key: string]: { [key: string]: boolean } };
 }
 
 function processValidationErrors(
@@ -54,6 +56,7 @@ function processValidationErrors(
         constraints: validationError.constraints,
         property: validationError.property,
         value: validationError.value,
+        contexts: validationError.contexts,
       };
     }
   }
@@ -138,35 +141,34 @@ export class IPAMController {
               // @ts-ignore
               const idValue = validationError.target[idField] as string;
 
-              // https://regex101.com/r/Alxmka/1
-              const newExpression = new RegExp(
+              let regex: RegExp;
+              if (validationError.contexts) {
+                const contextCore = Object.values(validationError.contexts)[0];
+
+                if (contextCore.locateField === false) {
+                  regex = new RegExp(`${idField}: ${idValue}`);
+                }
+              }
+
+              regex ??= new RegExp(
                 `((?<=(?<id>(?:${idField}: ${idValue})\\s+))\\s+(?<${validationError.property}>${validationError.property}: ${validationError.value}))|((?<${validationError.property}Second>${validationError.property}: ${validationError.value})(?=\\k<id>))`,
                 `gms`,
               );
 
-              const expression = new RegExp(
-                `((?<=${idField}: ${idValue}$\\s+).*(${validationError.property}: ${validationError.value}$))|((${validationError.property}: ${validationError.value}$).*(?=^\\s+${idField}: ${idValue}$))`,
-                'gms',
-              );
+              const match = regex.exec(ipamString);
 
-              const array = [...ipamString.matchAll(newExpression)];
-
-              const firstMatch = array[0];
-              const line = firstMatch.input
-                ?.substr(0, firstMatch.index)
-                .match(/\n/g)?.length;
-
-              // const expressionResult = expression.exec(ipamString);
-
-              // const line = expressionResult?.input
-              //   ?.substr(0, expressionResult?.index)
-              //   .match(/\n/g)?.length;
+              const line = match?.input?.substr(0, match.index).match(/\n/g)
+                ?.length;
 
               if (typeof line === 'number') {
+                const [key, message] = Object.entries(
+                  validationError.constraints,
+                )[0];
+
                 throw new Error(
-                  `${filePath.toString()}: line ${line + 1}, Error - ${
-                    validationError.constraints.validId
-                  } (no-unused-vars)`,
+                  `${filePath.toString()}: line ${
+                    line + 1
+                  }, Error - ${message} (${key})`,
                 );
               }
 

@@ -63,10 +63,6 @@ export class NetworkHost {
 
   public parentNetworkId: string;
 
-  /**
-   * TODO: Validate Contact ID to ensure it is valid
-   */
-
   @IsOptional()
   @IsString()
   @IsValidID('CONTACT')

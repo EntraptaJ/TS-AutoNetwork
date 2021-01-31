@@ -29,9 +29,6 @@ export class Community {
   })
   public id: string;
 
-  /**
-   * TODO: Setup validation to ensure community ID exists
-   */
   @IsString()
   @IsValidID('CONTACT')
   @JSONSchema({

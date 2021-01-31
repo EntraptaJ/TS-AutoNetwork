@@ -4,7 +4,6 @@ import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Service } from 'typedi';
 import { setContainer } from '../../Utils/Containers';
-import { CommunitySite as IPAMCommunitySite } from '../IPAM/IPAMConfig.gen';
 import { SiteDevice } from '../SiteDevice/SiteDevice';
 import { SiteType } from './SiteType';
 
@@ -15,7 +14,7 @@ import { SiteType } from './SiteType';
   required: ['id', 'name'],
 })
 @Service()
-export class Site implements IPAMCommunitySite {
+export class Site {
   @IsString()
   @JSONSchema({
     description:

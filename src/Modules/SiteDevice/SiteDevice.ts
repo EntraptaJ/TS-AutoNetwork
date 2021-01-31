@@ -1,6 +1,5 @@
 // src/Modules/NetworkDevices/NetworkDevice.ts
 import { Service } from 'typedi';
-import { Device as IPAMDevice } from '../IPAM/IPAMConfig.gen';
 import { NetworkHost } from '../Networks/NetworkHost';
 import { NetworkDeviceInterface } from './NetworkDeviceInterface';
 import { Address4 } from 'ip-address';
@@ -13,7 +12,7 @@ import { getManyContainer } from '../../Utils/Containers';
   title: 'SiteDevice',
 })
 @Service()
-export class SiteDevice implements IPAMDevice {
+export class SiteDevice {
   @IsString()
   @JSONSchema({
     description:

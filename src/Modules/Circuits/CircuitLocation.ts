@@ -6,7 +6,6 @@ import { createContainerName } from '../../Utils/Containers';
 import { IsValidID } from '../../Utils/Validator';
 import { Community } from '../Communities/Community';
 import { CommunityCircuitSpeed } from '../CommunityCircuits/CommunityCircuitSpeed';
-import { CircuitLocation as IPAMCircuitLocation } from '../IPAM/IPAMConfig.gen';
 
 @JSONSchema({
   title: 'Circuit Location',
@@ -15,8 +14,7 @@ import { CircuitLocation as IPAMCircuitLocation } from '../IPAM/IPAMConfig.gen';
   additionalProperties: false,
 })
 @Service()
-export class CircuitLocation
-  implements Omit<IPAMCircuitLocation, 'communuity'> {
+export class CircuitLocation {
   @IsString()
   @JSONSchema({
     description:

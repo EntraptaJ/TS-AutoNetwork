@@ -1,6 +1,6 @@
 # KristianFJones/TS-AutoNetwork
 
-This is a module created for the ISP I work at [K-Net](https://github.com/knetca), it's a custom build [IP Address Management (IPAM)](https://en.wikipedia.org/wiki/IP_address_management) system that is stored as a [YAML](https://en.wikipedia.org/wiki/YAML#:~:text=YAML%20(a%20recursive%20acronym%20for,is%20being%20stored%20or%20transmitted.) file.
+This is a module created for the ISP I work at [K-Net](https://github.com/knetca), it's a custom build [IP Address Management (IPAM)](https://en.wikipedia.org/wiki/IP_address_management) system that is stored as a [YAML](https://en.wikipedia.org/wiki/YAML#:~:text=YAML%20(a%20recursive%20acronym%20for,is%20being%20stored%20or%20transmitted.) file as is intended to be the root source of truth for all network related services and new automation systems.
 
 ## IPAM YAML File
 

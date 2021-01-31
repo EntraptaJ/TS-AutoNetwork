@@ -8,9 +8,6 @@ import { IsValidID } from '../../Utils/Validator';
   description: 'Community Site Device connection for a Network Host',
 })
 export class NetworkHostDevice {
-  /**
-   * TODO: Add Validation for Site IDs
-   */
   @IsString()
   @IsValidID('SITEDEVICE')
   @JSONSchema({
