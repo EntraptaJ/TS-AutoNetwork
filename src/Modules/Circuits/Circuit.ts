@@ -1,13 +1,12 @@
 // src/Modules/Circuits/Circuit.ts
-import { Type } from 'class-transformer';
-import { IsString, ValidateNested } from 'class-validator';
+import { IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import Container, { Service } from 'typedi';
 import xbytes from 'xbytes';
 import { createContainerName } from '../../Utils/Containers';
+import { IsValidID } from '../../Utils/Validator';
 import { Network } from '../Networks/Network';
 import { CircuitLocation } from './CircuitLocation';
-import { CircuitSide } from './CircuitSide';
 
 @JSONSchema({
   title: 'Circuit',
@@ -22,13 +21,13 @@ export class Circuit {
   })
   public id: string;
 
-  @ValidateNested()
-  @Type(() => CircuitSide)
-  public sideA: CircuitSide;
+  @IsString()
+  @IsValidID('CIRCUITLOCATION')
+  public sideAID: string;
 
-  @ValidateNested()
-  @Type(() => CircuitSide)
-  public sideZ: CircuitSide;
+  @IsString()
+  @IsValidID('CIRCUITLOCATION')
+  public sideZID: string;
 
   @IsString()
   @JSONSchema({
@@ -60,10 +59,10 @@ export class Circuit {
   }
 
   public get sideACircuitLocation(): CircuitLocation {
-    return Container.get(createContainerName('CIRCUITLOCATION', this.sideA.id));
+    return Container.get(createContainerName('CIRCUITLOCATION', this.sideAID));
   }
 
   public get sideZCircuitLocation(): Circuit {
-    return Container.get(createContainerName('CIRCUITLOCATION', this.sideZ.id));
+    return Container.get(createContainerName('CIRCUITLOCATION', this.sideZID));
   }
 }

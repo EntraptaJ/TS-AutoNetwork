@@ -17,10 +17,8 @@ communities:
 
 circuits:
   - id: tor.clink
-    sideA:
-      id: tor.c5
-    sideZ:
-      id: tor.c2
+    sideAID: tor.c5
+    sideZID: tor.c2
     speed: 10G
 
 circuitLocations:
