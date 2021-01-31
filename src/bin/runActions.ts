@@ -16,10 +16,12 @@ try {
 
   const config = await ipamController.loadIPAM('IPAM-Test.yaml');
   logger.log(LogMode.INFO, `Config loaded`, config);
-} catch (err) {
-  if (isError(err)) {
-    console.error(err.message);
+} catch (errs) {
+  for (const err of errs) {
+    console.error(err);
   }
 
-  process.exit(1);
+  // process.exit(1);
 }
+
+setInterval(() => console.log('Fucker'), 5000);

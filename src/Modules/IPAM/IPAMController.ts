@@ -13,12 +13,7 @@ import { load } from 'js-yaml';
 import { defaultMetadataStorage } from 'class-transformer/storage';
 import { transformAndValidate } from 'class-transformer-validator';
 import { ValidationError } from 'class-validator';
-import {
-  ContainerKeys,
-  isContainerKey,
-  TypeIDField,
-  ValueTypes,
-} from '../../Utils/Types';
+import { ContainerKeys, isContainerKey, TypeIDField } from '../../Utils/Types';
 
 function isValidationErrors(
   errors: ValidationError[],
@@ -28,40 +23,6 @@ function isValidationErrors(
   }
 
   return false;
-}
-
-interface ProcessedValidationError {
-  target: ValueTypes[keyof ValueTypes];
-  constraints: {
-    [type: string]: string;
-  };
-  property: string;
-  value: string;
-
-  contexts?: { [key: string]: { [key: string]: boolean } };
-}
-
-function processValidationErrors(
-  validationErrors: ValidationError[],
-): ProcessedValidationError {
-  for (const validationError of validationErrors) {
-    if (validationError.children.length > 0) {
-      return processValidationErrors(validationError.children);
-    }
-
-    if (validationError.constraints && validationError.target) {
-      console.log(validationError);
-      return {
-        target: validationError.target as ValueTypes[keyof ValueTypes],
-        constraints: validationError.constraints,
-        property: validationError.property,
-        value: validationError.value,
-        contexts: validationError.contexts,
-      };
-    }
-  }
-
-  throw new Error('Invalid Errors');
 }
 
 @Service()
@@ -105,7 +66,7 @@ export class IPAMController {
     return writeFile(schemaFilePath, JSON.stringify(schema.schema));
   }
 
-  public async loadIPAM(ipamPath?: PathLike): Promise<IPAM> {
+  public async loadIPAM(ipamPath?: PathLike): Promise<IPAM | string[]> {
     const filePath = ipamPath ?? 'IPAM.yaml';
 
     const ipamValidator = await this.createSchema();
@@ -114,6 +75,8 @@ export class IPAMController {
     const ipamString = ipamFile.toString();
 
     const ipamYAML = load(ipamString);
+
+    const errors: Set<string> = new Set();
 
     if (ipamValidator(ipamYAML)) {
       try {
@@ -126,61 +89,93 @@ export class IPAMController {
           },
         });
         return result;
-      } catch (err) {
-        if (isValidationErrors(err)) {
-          const validationError = processValidationErrors(err);
+      } catch (errs) {
+        logger.log(LogMode.DEBUG, `loadIPAM() caught error: `, errs);
 
-          const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
+        if (isValidationErrors(errs)) {
+          function flat(
+            r: ValidationError[],
+            currentValue: ValidationError,
+          ): ValidationError[] {
+            if (currentValue.children.length > 0) {
+              return currentValue.children.reduce(flat, r);
+            }
 
-          if (isContainerKey(className)) {
-            const idField = TypeIDField[className];
+            r.push(currentValue);
+            return r;
+          }
 
-            if (idField in validationError.target) {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const idValue = validationError.target[idField] as string;
+          const newCoreValidationError = errs.reduce(flat, []);
 
-              let regex: RegExp;
-              if (validationError.contexts) {
-                const contextCore = Object.values(validationError.contexts)[0];
+          for (const validationError of newCoreValidationError) {
+            if (validationError.target) {
+              const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
 
-                if (contextCore.locateField === false) {
-                  regex = new RegExp(`${idField}: ${idValue}`);
+              if (isContainerKey(className)) {
+                const idField = TypeIDField[className];
+
+                logger.log(LogMode.DEBUG, `loadIPAM() idField: `, idField);
+
+                if (idField in validationError.target) {
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  const idValue = validationError.target[idField] as string;
+
+                  let regex: RegExp;
+                  if (validationError.contexts) {
+                    const contextCore = Object.values(
+                      validationError.contexts,
+                    )[0];
+
+                    if (contextCore.locateField === false) {
+                      regex = new RegExp(`${idField}: ${idValue}`);
+                    }
+                  }
+
+                  regex ??= new RegExp(
+                    `((?<=(?<id>(?:${idField}: ${idValue})\\s+))\\s+(?<${validationError.property}>${validationError.property}: ${validationError.value}))|((?<${validationError.property}Second>${validationError.property}: ${validationError.value})(?=\\k<id>))`,
+                    `gms`,
+                  );
+
+                  const match = regex.exec(ipamString);
+
+                  const line = match?.input?.substr(0, match.index).match(/\n/g)
+                    ?.length;
+
+                  if (typeof line === 'number') {
+                    const [key, message] = Object.entries(
+                      validationError.constraints,
+                    )[0];
+
+                    console.error();
+
+                    errors.add(
+                      `${filePath.toString()}: line ${
+                        line + 1
+                      }, Error - ${message} (${key})`,
+                    );
+                  }
                 }
               }
 
-              regex ??= new RegExp(
-                `((?<=(?<id>(?:${idField}: ${idValue})\\s+))\\s+(?<${validationError.property}>${validationError.property}: ${validationError.value}))|((?<${validationError.property}Second>${validationError.property}: ${validationError.value})(?=\\k<id>))`,
-                `gms`,
+              logger.log(LogMode.DEBUG, `loadIPAM() className: `, className);
+            } else {
+              logger.log(
+                LogMode.ERROR,
+                `Validation error processing IPAM: `,
+                validationError,
               );
-
-              const match = regex.exec(ipamString);
-
-              const line = match?.input?.substr(0, match.index).match(/\n/g)
-                ?.length;
-
-              if (typeof line === 'number') {
-                const [key, message] = Object.entries(
-                  validationError.constraints,
-                )[0];
-
-                throw new Error(
-                  `${filePath.toString()}: line ${
-                    line + 1
-                  }, Error - ${message} (${key})`,
-                );
-              }
-
-              throw new Error('Error while parsing validation error');
             }
           }
         }
       }
     } else {
-      console.log('HelloFucker');
+      logger.log(LogMode.WARN, `Invalid IPAM`);
+
+      logger.log(LogMode.DEBUG, `TODO: Handle processing invalid IPAM`);
     }
 
-    throw new Error('Invalid config.yaml file');
+    throw errors;
   }
 }
