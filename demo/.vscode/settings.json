@@ -1,5 +1,0 @@
-{
-  "yaml.schemas": {
-    "https://raw.githubusercontent.com/KristianFJones/TS-AutoNetwork/master/schemas/IPAM.json": ["IPAM.yaml", "ipam.yaml", "ipam.yml", "IPAM.yml"]
-  }
-}

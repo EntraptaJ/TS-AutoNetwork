@@ -1,0 +1,20 @@
+// src/Modules/Circuits/CircuitSide.ts
+import { IsString } from 'class-validator';
+import { JSONSchema } from 'class-validator-jsonschema';
+import { Service } from 'typedi';
+import { IsValidID } from '../../Utils/Validator';
+
+@JSONSchema({
+  title: 'Circuit Side',
+  description: 'A single circuit connection',
+  additionalProperties: false,
+})
+@Service()
+export class CircuitSide {
+  @IsString()
+  @IsValidID('CIRCUITLOCATION')
+  @JSONSchema({
+    description: 'Circuit ID referencing the CircuitLocation ID',
+  })
+  public id: string;
+}

@@ -1,0 +1,55 @@
+communities:
+  - name: Toronto
+    id: tor
+    contactId: tor.todo1
+    sites:
+      - id: tor.c1
+        name: Toronto Cabniet 12
+        devices:
+          - id: tor.c1.rt1
+            name: Torotno Cabinet 1 Router 1
+
+      - id: tor.c2
+        name: Toronto Cabniet 2
+        devices:
+          - id: tor.c2.rt0
+            name: Torotno Cabinet 2 Router 1
+
+circuits:
+  - id: tor.clink
+    sideAID: tor.c1
+    sideZID: tor.c2
+    speed: 10G
+
+circuitLocations:
+  - id: tor.c1
+    address: Front Street
+    provider: Bell
+    communuityId: tor
+    demarcSpeed: 10G
+
+  - id: tor.c2
+    address: Front Street
+    provider: Bell
+    communuityId: tor
+    demarcSpeed: 10G
+
+contacts:
+  - id: tor.todo1
+    name: TODO
+
+networks:
+  - prefix: 1.0.0.0/23
+    networks:
+      - prefix: 1.0.0.0/30
+        description: Toronto Cabniet P2P
+        hosts:
+          - ip: 1.0.0.1
+            description: Toronto Cabniet 1
+            contactId: tor.todo1
+            deviceId: tor.c1.rt0
+            deviceInterface: TenGigE0/0/0/1
+          - ip: 1.0.0.2
+            description: Toronto Cabniet 2
+            deviceId: tor.c2.rt0
+            deviceInterface: TenGigE0/0/0/2

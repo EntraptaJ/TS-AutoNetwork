@@ -3,97 +3,122 @@ import { TestSuite } from '@k-foss/ts-estests';
 import { deepStrictEqual } from 'assert';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { ipamConfigController } from '../IPAM/IPAMConfigController';
+import { IPAMController } from '../IPAM/IPAMController';
 
-export class ContactTestSuite extends TestSuite {
+export class ContactSuite extends TestSuite {
   public testName = 'Contact Test Suite';
 
   public async test(): Promise<void> {
-    const ipam = await ipamConfigController.loadFile(
-      resolve(
-        fileURLToPath(import.meta.url),
-        '../fixtures/ContactSample1.yaml',
-      ),
+    const ipamController = IPAMController.createIPAM();
+
+    const contactFixture1Path = resolve(
+      fileURLToPath(import.meta.url),
+      '../fixtures/ContactSample1.yaml',
     );
 
-    const contact1 = ipam.contacts[0];
-    const contact2 = ipam.contacts[1];
-    const contact3 = ipam.contacts[2];
+    const config = await ipamController.loadIPAM(contactFixture1Path);
+
+    /**
+     * Contacts
+     */
+
+    /**
+     * Contact 1 - Kristian Jones
+     */
+    const kristianjones1 = config.contacts.find(
+      (contact) => contact.name === 'Kristian Jones',
+    );
 
     deepStrictEqual(
-      contact1.id,
+      kristianjones1?.id,
       'lab1.kfj',
-      'ipam.contacts[0].id === lab1.kfj',
+      'kristianjones1.id === lab1.kfj',
+    );
+    deepStrictEqual(
+      kristianjones1?.name,
+      'Kristian Jones',
+      'kristianjones1.name === Kristian Jones',
+    );
+
+    /**
+     * Contact 2 - Hello World
+     */
+    const helloworld1 = config.contacts.find(
+      (contact) => contact.name === 'Hello World',
     );
 
     deepStrictEqual(
-      contact2.id,
+      helloworld1?.id,
       'core1.hello',
-      'ipam.contacts[1].id === core1.hello',
+      'helloworld1.id === core1.hello',
+    );
+    deepStrictEqual(
+      helloworld1?.name,
+      'Hello World',
+      'helloworld1.name === Hello World',
+    );
+
+    /**
+     * Contact 3 - HelloTest
+     */
+    const hellotest1 = config.contacts.find(
+      (contact) => contact.name === 'HelloTest',
+    );
+
+    deepStrictEqual(hellotest1?.id, 'net.test', 'hellotest1.id === net.test');
+    deepStrictEqual(
+      hellotest1?.name,
+      'HelloTest',
+      'hellotest1.name === HelloTest',
+    );
+
+    /**
+     * Contact 4 - Third Party Provider
+     */
+    const thirdPartyProvider1 = config.contacts.find(
+      (contact) => contact.id === 'thirdparty.core',
     );
 
     deepStrictEqual(
-      contact3.id,
-      'net.test',
-      'ipam.contacts[2].id === net.test',
-    );
-
-    const community1 = ipam.communities[0];
-    const community2 = ipam.communities[1];
-
-    deepStrictEqual(
-      community1.contactId,
-      'lab1.kfj',
-      'ipam.communities[0].contactId === lab1.kfj',
+      thirdPartyProvider1?.id,
+      'thirdparty.core',
+      'thirdPartyProvider1?.id === thirdparty.core',
     );
     deepStrictEqual(
-      community1.contact.id,
-      'lab1.kfj',
-      'ipam.communities[0].contact.id === lab1.kfj',
+      thirdPartyProvider1?.name,
+      'Third Party Provider 1',
+      'thirdPartyProvider1?.name === Third Party Provider 1',
     );
 
-    deepStrictEqual(
-      community2.contactId,
-      'core1.hello',
-      'ipam.communities[1].contactId === core1.hello',
-    );
-    deepStrictEqual(
-      community2.contact.id,
-      'core1.hello',
-      'ipam.communities[1].contact.id === core1.hello',
-    );
-    deepStrictEqual(
-      community2.contact,
-      contact2,
-      'ipam.communities[1].contact === ipam.contacts[1]',
-    );
-
-    const network1 = ipam.networks[0];
-
-    if (network1.networks) {
-      const subnetwork1 = network1.networks[0];
-
-      console.log(subnetwork1.prefix, subnetwork1.contact, subnetwork1.circuit);
-
-      deepStrictEqual(subnetwork1.contact?.id, network1.contactId);
-    }
-
-    deepStrictEqual(
-      network1.contactId,
-      'net.test',
-      'ipam.networks[0].contactId === net.test',
+    /**
+     * Networks 1 - HelloTest
+     */
+    const coreNetwork = config.networks.find(
+      (network) => network.prefix === '1.1.1.0/24',
     );
 
     deepStrictEqual(
-      network1.contact?.id,
-      'net.test',
-      'ipam.networks[0].contact?.id === net.test',
+      coreNetwork?.contactId,
+      hellotest1.id,
+      'coreNetwork?.contactId === hellotest1.id',
+    );
+    deepStrictEqual(
+      coreNetwork?.contact,
+      hellotest1,
+      'coreNetwork?.contact === hellotest1',
+    );
+
+    /**
+     * Network 1 - Sub Network 1 - External Provider
+     */
+    const coreNetworkSub1 = coreNetwork.networks.find(
+      (network) => network.prefix === '1.1.1.0/30',
     );
 
     deepStrictEqual(
-      network1.contact,
-      contact3,
-      'ipam.networks[0].contact === ipam.contacts[2]',
+      coreNetworkSub1?.prefix,
+      '1.1.1.0/30',
+      'coreNetworkSub1?.prefix === 1.1.1.0/30',
     );
   }
 }

@@ -1,32 +1,74 @@
 // src/Modules/Networks/NetworkHost.ts
-import Container, { Service } from 'typedi';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+import { JSONSchema } from 'class-validator-jsonschema';
+import { Service, Container } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
+import { IsValidID } from '../../Utils/Validator';
 import { Contact } from '../Contacts/Contact';
-import {
-  NetworkDeviceLink,
-  NetworkHost as IPAMNetworkHost,
-} from '../IPAM/IPAMConfig.gen';
-import { NetworkDevice } from '../NetworkDevices/NetworkDevice';
+import { SiteDevice } from '../SiteDevice/SiteDevice';
 import { Network } from './Network';
+import { NetworkHostDevice } from './NetworkHostDevice';
 
+@JSONSchema({
+  title: 'NetworkHost',
+  description: 'TODO',
+  additionalProperties: false,
+})
 @Service()
-export class NetworkHost implements IPAMNetworkHost {
+export class NetworkHost {
+  @IsString()
+  @JSONSchema({
+    description: 'IP Address for this host entry',
+  })
   public ip: string;
 
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Friendly Description for the Network Host',
+  })
+  public description?: string;
+
   /**
-   * Friendly Description for the Network Host
+   * TODO: Create Network Device Link Schema
    */
-  public description: string;
 
-  public device?: NetworkDeviceLink;
+  @IsOptional()
+  @Type(() => NetworkHostDevice)
+  @JSONSchema({
+    deprecated: true,
+  })
+  public device?: NetworkHostDevice;
 
+  @IsOptional()
+  @IsValidID('SITEDEVICE')
+  @JSONSchema({
+    description: 'Site Device Reference ID',
+  })
+  public deviceId?: string;
+
+  @IsOptional()
+  @JSONSchema({
+    description: 'Site Device Interface',
+  })
+  public deviceInterface: string;
+
+  @IsOptional()
+  @IsString()
+  @JSONSchema({
+    description: 'Friendly Description for the Network Host',
+  })
   public hostname?: string;
 
   public parentNetworkId: string;
 
-  /**
-   * Unique Contact Id reference
-   */
+  @IsOptional()
+  @IsString()
+  @IsValidID('CONTACT')
+  @JSONSchema({
+    description: 'Reference ID for Contact',
+  })
   public contactId?: string;
 
   /**
@@ -47,13 +89,9 @@ export class NetworkHost implements IPAMNetworkHost {
     return Container.get(createContainerName('NETWORK', this.parentNetworkId));
   }
 
-  public get coreDevice(): NetworkDevice | undefined {
+  public get coreDevice(): SiteDevice | undefined {
     if (this.device?.id) {
-      return Container.get(createContainerName('SITE_DEVICE', this.device.id));
+      return Container.get(createContainerName('SITEDEVICE', this.device.id));
     }
-  }
-
-  public constructor(options: Partial<NetworkHost>) {
-    Object.assign(this, options);
   }
 }

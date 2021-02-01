@@ -1,22 +1,38 @@
 // src/Modules/Circuits/Circuit.ts
-import Container, { Service } from 'typedi';
-import { createContainerName } from '../../Utils/Containers';
-import {
-  Circuit as IPAMCircuit,
-  CircuitSide as IPAMCircuitSide,
-} from '../IPAM/IPAMConfig.gen';
+import { IsString } from 'class-validator';
+import { JSONSchema } from 'class-validator-jsonschema';
+import { Service, Container } from 'typedi';
 import xbytes from 'xbytes';
+import { createContainerName } from '../../Utils/Containers';
+import { IsValidID } from '../../Utils/Validator';
 import { Network } from '../Networks/Network';
 import { CircuitLocation } from './CircuitLocation';
 
+@JSONSchema({
+  title: 'Circuit',
+  description: 'Circuit connecting two sites, or what is normally an "EVC"',
+  additionalProperties: false,
+})
 @Service()
-export class Circuit implements IPAMCircuit {
+export class Circuit {
+  @IsString()
+  @JSONSchema({
+    description: 'Unique Circuit ID used for refences from other objects',
+  })
   public id: string;
 
-  public sideA: IPAMCircuitSide;
+  @IsString()
+  @IsValidID('CIRCUITLOCATION')
+  public sideAID: string;
 
-  public sideZ: IPAMCircuitSide;
+  @IsString()
+  @IsValidID('CIRCUITLOCATION')
+  public sideZID: string;
 
+  @IsString()
+  @JSONSchema({
+    description: 'EVC Speed that the circuit is capable of achiving',
+  })
   public speed: string;
 
   public get networks(): Network[] {
@@ -43,18 +59,10 @@ export class Circuit implements IPAMCircuit {
   }
 
   public get sideACircuitLocation(): CircuitLocation {
-    return Container.get(
-      createContainerName('CIRCUIT_LOCATION', this.sideA.id),
-    );
+    return Container.get(createContainerName('CIRCUITLOCATION', this.sideAID));
   }
 
   public get sideZCircuitLocation(): Circuit {
-    return Container.get(
-      createContainerName('CIRCUIT_LOCATION', this.sideZ.id),
-    );
-  }
-
-  public constructor(options: Partial<Circuit>) {
-    Object.assign(this, options);
+    return Container.get(createContainerName('CIRCUITLOCATION', this.sideZID));
   }
 }

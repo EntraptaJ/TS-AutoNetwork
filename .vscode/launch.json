@@ -10,6 +10,9 @@
       "restart": true,
 
       "cwd": "${workspaceFolder}",
+      "env": {
+        "LOG_MODE": "DEBUG"
+      },
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nodemon"]
     }

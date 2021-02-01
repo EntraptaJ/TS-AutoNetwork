@@ -1,14 +1,25 @@
 // src/Modules/CommunityContacts/CommunityContact.ts
+import { JSONSchema } from 'class-validator-jsonschema';
 import { Service } from 'typedi';
-import { Contact as IPAMContact } from '../IPAM/IPAMConfig.gen';
+import { IsString } from 'class-validator';
 
+@JSONSchema({
+  title: 'Contact',
+  description: 'Contact for community/site/prefix',
+  additionalProperties: false,
+})
 @Service()
-export class Contact implements IPAMContact {
+export class Contact {
+  @IsString()
   public id: string;
 
-  public name: string;
+  /**
+   * TODO: Determine contact fields and finish
+   */
 
-  public constructor(options: Partial<Contact>) {
-    Object.assign(this, options);
-  }
+  @IsString()
+  @JSONSchema({
+    description: 'Friendly contact name',
+  })
+  public name: string;
 }
