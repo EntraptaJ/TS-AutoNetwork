@@ -95,8 +95,8 @@ export class IPAMSuite extends TestSuite {
     await rejects(
       invalidIPAMController2.loadIPAM(ipamInvalidFixture2Path),
       [
-        '/workspace/src/Modules/IPAM/fixtures/InvalidFile2.yaml: line 50, Error - Sitedevice with ID (tor.c1.rt0) does not exist! (validId)',
-        '/workspace/src/Modules/IPAM/fixtures/InvalidFile2.yaml: line 54, Error - Sitedevice with ID (tor.c2.rt4) does not exist! (validId)',
+        `${ipamInvalidFixture2Path}: line 50, Error - Sitedevice with ID (tor.c1.rt0) does not exist! (validId)`,
+        `${ipamInvalidFixture2Path}: line 54, Error - Sitedevice with ID (tor.c2.rt4) does not exist! (validId)`,
       ],
       'Invalid Device ID Throws',
     );
