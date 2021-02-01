@@ -76,14 +76,12 @@ export class IPAMSuite extends TestSuite {
     );
 
     /**
-     * Invalid YAML #2 - Single Invalid Device ID
+     * Invalid YAML #2 - Two Invalid Device IDs
      */
     const ipamInvalidFixture2Path = resolve(
       fileURLToPath(import.meta.url),
       '../fixtures/InvalidFile2.yaml',
     );
-
-    console.log(ipamInvalidFixture2Path);
 
     const ipamInvalidContainer2 = Container.of('IPAMInvalid2');
     const invalidIPAMController2 = IPAMController.createIPAM({
@@ -97,6 +95,28 @@ export class IPAMSuite extends TestSuite {
         `${ipamInvalidFixture2Path}: line 54, Error - Sitedevice with ID (tor.c2.rt4) does not exist! (validId)`,
       ],
       'Invalid Device ID Throws',
+    );
+
+    /**
+     * Invalid YAML #3 - One Invalid Device ID and One Invalid Subnet prefix
+     */
+    const ipamInvalidFixture3Path = resolve(
+      fileURLToPath(import.meta.url),
+      '../fixtures/InvalidFile3.yaml',
+    );
+
+    const ipamInvalidContainer3 = Container.of('IPAMInvalid3');
+    const invalidIPAMController3 = IPAMController.createIPAM({
+      container: ipamInvalidContainer3,
+    });
+
+    await rejects(
+      invalidIPAMController3.loadIPAM(ipamInvalidFixture3Path),
+      [
+        `${ipamInvalidFixture3Path}: line 44, Error - Prefix (1.0.0.0/23) is not a valid parent IPv4 Prefix of this network! (ValidSubnet)`,
+        `${ipamInvalidFixture3Path}: line 50, Error - Sitedevice with ID (tor.c1.rt0) does not exist! (validId)`,
+      ],
+      'Invalid Device ID & Invalid Network Prefix Throws',
     );
   }
 }
