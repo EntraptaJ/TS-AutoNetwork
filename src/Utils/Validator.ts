@@ -2,6 +2,7 @@
 // src/Utils/Validator.ts
 import { registerDecorator, ValidationOptions } from 'class-validator';
 import Container from 'typedi';
+import { contextToken } from '../Library/Context';
 import { createContainerName } from './Containers';
 import { toTitleCase } from './Strings';
 import { ContainerKeys } from './Types';
@@ -22,7 +23,9 @@ export function IsValidID<T extends keyof typeof ContainerKeys>(
       validator: {
         validate(value: string): boolean {
           try {
-            const linkedObject = Container.get(createContainerName(key, value));
+            const linkedObject = Container.get(contextToken).container.get(
+              createContainerName(key, value),
+            );
 
             return typeof linkedObject !== 'undefined';
           } catch {

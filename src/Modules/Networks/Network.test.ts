@@ -1,6 +1,5 @@
 // src/Modules/Networks/Network.test.ts
 import { TestSuite } from '@k-foss/ts-estests';
-import Container from 'typedi';
 import { IPAMController } from '../IPAM/IPAMController';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -11,7 +10,7 @@ export class NetworkTestSuite extends TestSuite {
   public testName = 'Network Test Suite';
 
   public async test(): Promise<void> {
-    const ipamController = Container.get(IPAMController);
+    const ipamController = IPAMController.createIPAM();
 
     const networkFixturePath = resolve(
       fileURLToPath(import.meta.url),

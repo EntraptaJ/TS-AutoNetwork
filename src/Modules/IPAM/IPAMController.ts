@@ -5,28 +5,44 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { PathLike } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import { resolve } from 'path';
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { fileURLToPath } from 'url';
 import { logger, LogMode } from '../../Library/Logger';
 import { IPAM } from './IPAM';
 import { load } from 'js-yaml';
 import { defaultMetadataStorage } from 'class-transformer/storage';
-import { transformAndValidate } from 'class-transformer-validator';
-import { ValidationError } from 'class-validator';
-import { ContainerKeys, isContainerKey, TypeIDField } from '../../Utils/Types';
+import { plainToClass } from 'class-transformer';
+import { validateOrReject, ValidationError } from 'class-validator';
+import { getIDField, isIPAMType, ValueTypes } from '../../Utils/Types';
+import { isValidationErrors } from '../../Utils/ValidatorErrors';
+import { contextToken, createContext } from '../../Library/Context';
+import type { Context } from '../../Library/Context';
+interface FieldContext {
+  locateField: boolean;
+}
 
-function isValidationErrors(
-  errors: ValidationError[],
-): errors is ValidationError[] {
-  if ('property' in errors[0]) {
-    return true;
-  }
-
-  return false;
+function isFieldContext(
+  context: FieldContext | Record<string, boolean>,
+): context is FieldContext {
+  return 'locateField' in context;
 }
 
 @Service()
 export class IPAMController {
+  @Inject(contextToken)
+  public context: Context;
+
+  public static createIPAM(initialContext?: Context): IPAMController {
+    const context = createContext(initialContext);
+
+    return context.container.get(IPAMController);
+  }
+
+  /**
+   * Create the AJV JSON Schema from `IPAM.ts` class.
+   *
+   * @returns Promise that resovles to the validate function for `IPAM`
+   */
   public async createSchema(): Promise<ValidateFunction<IPAM>> {
     logger.log(
       LogMode.DEBUG,
@@ -55,6 +71,11 @@ export class IPAMController {
     return ajv.compile(coreSchema, true);
   }
 
+  /**
+   * Load JSON Schema and save `IPAM.json` to Schemas folder.
+   *
+   * @returns Promise that resolves once the file has been saved.
+   */
   public async saveSchema(): Promise<void> {
     const schema = await this.createSchema();
 
@@ -66,7 +87,13 @@ export class IPAMController {
     return writeFile(schemaFilePath, JSON.stringify(schema.schema));
   }
 
-  public async loadIPAM(ipamPath?: PathLike): Promise<IPAM | string[]> {
+  /**
+   * Load an `IPAM.yaml` validate the file agaisnt the JSON Schema, and run `class-validator` and `class-transformer`
+   * @param ipamPath File path to IPAM File @default `IPAM.yaml`
+   *
+   * @returns Promise resolving to processed and validated IPAM Class.
+   */
+  public async loadIPAM(ipamPath?: PathLike): Promise<IPAM> {
     const filePath = ipamPath ?? 'IPAM.yaml';
 
     const ipamValidator = await this.createSchema();
@@ -80,15 +107,15 @@ export class IPAMController {
 
     if (ipamValidator(ipamYAML)) {
       try {
-        const result = await transformAndValidate(IPAM, ipamYAML, {
-          validator: {
-            validationError: {
-              target: true,
-              value: true,
-            },
-          },
+        const transformed = plainToClass(IPAM, ipamYAML, {
+          strategy: 'exposeAll',
         });
-        return result;
+
+        logger.log(LogMode.DEBUG, `Stuff: `, transformed);
+
+        await validateOrReject(transformed);
+
+        return transformed;
       } catch (errs) {
         logger.log(LogMode.DEBUG, `loadIPAM() caught error: `, errs);
 
@@ -108,64 +135,51 @@ export class IPAMController {
           const newCoreValidationError = errs.reduce(flat, []);
 
           for (const validationError of newCoreValidationError) {
-            if (validationError.target) {
-              const className = validationError.target.constructor.name.toUpperCase() as keyof typeof ContainerKeys;
+            const target = validationError.target as ValueTypes[keyof ValueTypes];
 
-              if (isContainerKey(className)) {
-                const idField = TypeIDField[className];
+            if (isIPAMType(target)) {
+              const [idFieldName, idFieldValue] = getIDField(target);
 
-                logger.log(LogMode.DEBUG, `loadIPAM() idField: `, idField);
+              let regex: RegExp;
+              if (validationError.contexts) {
+                const contextCore = Object.values(validationError.contexts)[0];
 
-                if (idField in validationError.target) {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  const idValue = validationError.target[idField] as string;
-
-                  let regex: RegExp;
-                  if (validationError.contexts) {
-                    const contextCore = Object.values(
-                      validationError.contexts,
-                    )[0];
-
-                    if (contextCore.locateField === false) {
-                      regex = new RegExp(`${idField}: ${idValue}`);
-                    }
-                  }
-
-                  regex ??= new RegExp(
-                    `((?<=(?<id>(?:${idField}: ${idValue})\\s+))\\s+(?<${validationError.property}>${validationError.property}: ${validationError.value}))|((?<${validationError.property}Second>${validationError.property}: ${validationError.value})(?=\\k<id>))`,
-                    `gms`,
-                  );
-
-                  const match = regex.exec(ipamString);
-
-                  const line = match?.input?.substr(0, match.index).match(/\n/g)
-                    ?.length;
-
-                  if (typeof line === 'number') {
-                    const [key, message] = Object.entries(
-                      validationError.constraints,
-                    )[0];
-
-                    console.error();
-
-                    errors.add(
-                      `${filePath.toString()}: line ${
-                        line + 1
-                      }, Error - ${message} (${key})`,
-                    );
+                if (isFieldContext(contextCore)) {
+                  if (contextCore?.locateField === false) {
+                    regex = new RegExp(`${idFieldName}: ${idFieldValue}`);
                   }
                 }
               }
 
-              logger.log(LogMode.DEBUG, `loadIPAM() className: `, className);
-            } else {
-              logger.log(
-                LogMode.ERROR,
-                `Validation error processing IPAM: `,
-                validationError,
+              regex ??= new RegExp(
+                `((?<=(?<id>(?:${idFieldName}: ${idFieldValue})\\s+))\\s+(?<${
+                  validationError.property
+                }>${validationError.property}: ${
+                  validationError.value as string
+                }))|((?<${validationError.property}Second>${
+                  validationError.property
+                }: ${validationError.value as string})(?=\\k<id>))`,
+                `gms`,
               );
+
+              const match = regex.exec(ipamString);
+
+              const line = match?.input?.substr(0, match.index).match(/\n/g)
+                ?.length;
+
+              if (typeof line === 'number') {
+                const [key, message] = Object.entries(
+                  validationError.constraints as { [key: string]: string },
+                )[0];
+
+                errors.add(
+                  `${filePath.toString()}: line ${
+                    line + 1
+                  }, Error - ${message} (${key})`,
+                );
+              }
+
+              logger.log(LogMode.DEBUG, `loadIPAM() className: `);
             }
           }
         }
@@ -176,6 +190,7 @@ export class IPAMController {
       logger.log(LogMode.DEBUG, `TODO: Handle processing invalid IPAM`);
     }
 
-    throw errors;
+    // eslint-disable-next-line no-throw-literal
+    throw Array.from(errors);
   }
 }

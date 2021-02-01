@@ -1,7 +1,7 @@
 // src/Modules/Circuits/CircuitLocation.ts
 import { IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
-import Container, { Service } from 'typedi';
+import { Service, Container } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
 import { IsValidID } from '../../Utils/Validator';
 import { Community } from '../Communities/Community';

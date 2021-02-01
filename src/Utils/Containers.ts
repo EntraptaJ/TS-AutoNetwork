@@ -14,7 +14,7 @@ export function setContainer<T extends keyof typeof ContainerKeys>(
   key: T,
   id: string,
   value: ValueTypes[T],
-  container = Container,
+  container = Container.of(),
 ): void {
   const containerName = createContainerName(key, id);
 
@@ -28,7 +28,7 @@ export function setContainer<T extends keyof typeof ContainerKeys>(
 
 export function getManyContainer<T extends keyof typeof ContainerKeys>(
   key: T,
-  container = Container,
+  container = Container.of(),
 ): ValueTypes[T][] {
   const valueIds = container.getMany<string>(key);
 

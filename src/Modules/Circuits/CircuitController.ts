@@ -1,5 +1,5 @@
 // src/Modules/Circuits/CircuitController.ts
-import Container, { Inject, Service } from 'typedi';
+import { Inject, Service, Container } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
 import { IPAM } from '../IPAM/IPAM';
 import { SiteDevice } from '../SiteDevice/SiteDevice';

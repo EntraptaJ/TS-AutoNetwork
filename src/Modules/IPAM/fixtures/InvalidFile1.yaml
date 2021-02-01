@@ -12,7 +12,7 @@ communities:
       - id: tor.c2
         name: Toronto Cabniet 2
         devices:
-          - id: tor.c2.rt1
+          - id: tor.c2.rt0
             name: Torotno Cabinet 2 Router 1
 
 circuits:
@@ -42,6 +42,7 @@ networks:
   - prefix: 1.0.0.0/23
     networks:
       - prefix: 1.0.0.0/30
+        description: Toronto Cabniet P2P
         hosts:
           - ip: 1.0.0.1
             description: Toronto Cabniet 1
@@ -50,5 +51,5 @@ networks:
             deviceInterface: TenGigE0/0/0/1
           - ip: 1.0.0.2
             description: Toronto Cabniet 2
-            deviceId: tor.c2.rt1
+            deviceId: tor.c2.rt0
             deviceInterface: TenGigE0/0/0/2

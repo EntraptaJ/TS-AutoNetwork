@@ -8,14 +8,16 @@ import {
 } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 import { Address4 } from 'ip-address';
-import Container, { Service } from 'typedi';
+import { Container, Service } from 'typedi';
+import { contextToken } from '../../Library/Context';
+import { logger, LogMode } from '../../Library/Logger';
 import { createContainerName, setContainer } from '../../Utils/Containers';
+import { IsValidID } from '../../Utils/Validator';
 import { Circuit } from '../Circuits/Circuit';
 import { Contact } from '../Contacts/Contact';
 import { NetworkHost } from './NetworkHost';
 import { NetworkRange } from './NetworkRange';
 import { NetworkType } from './NetworkType';
-import { IsValidID } from '../../Utils/Validator';
 import { ValidPrefix, ValidSubnet } from './PrefixValidator';
 
 @JSONSchema({
@@ -38,7 +40,6 @@ export class Network {
   public prefix: string;
 
   public get IPv4(): Address4 {
-    console.log('Creating IPv4', this.prefix);
     return new Address4(this.prefix);
   }
 
@@ -64,7 +65,9 @@ export class Network {
   @IsString()
   @IsValidID('CIRCUIT')
   @Transform((circuitId: string, network: Network) => {
-    Container.set({
+    logger.log(LogMode.DEBUG, `Transforming Circuit Ids from IPAM`);
+
+    Container.get(contextToken).container.set({
       id: `circuitNetworks-${circuitId}`,
       multiple: true,
       value: network.prefix,
@@ -80,12 +83,21 @@ export class Network {
   @IsOptional()
   @ValidateNested({ each: true })
   @Transform((networks: Network[], parentNetwork: Network) => {
+    logger.log(LogMode.DEBUG, `Transforming Subnetworks from IPAM`);
+
     return networks.map((item) => {
       item.parentNetworkId = parentNetwork.prefix;
 
-      setContainer('NETWORK', item.prefix, item);
+      setContainer(
+        'NETWORK',
+        item.prefix,
+        item,
+        Container.get(contextToken).container,
+      );
 
-      return Container.get(createContainerName('NETWORK', item.prefix));
+      return Container.get(contextToken).container.get(
+        createContainerName('NETWORK', item.prefix),
+      );
     });
   })
   @Type(() => Network)
@@ -106,7 +118,7 @@ export class Network {
 
   public get parentNetwork(): Network | undefined {
     if (this.parentNetworkId) {
-      return Container.get(
+      return Container.get(contextToken).container.get(
         createContainerName('NETWORK', this.parentNetworkId),
       );
     }
@@ -136,7 +148,9 @@ export class Network {
 
   public get contact(): Contact | undefined {
     if (this.contactId) {
-      return Container.get(createContainerName('CONTACT', this.contactId));
+      return Container.get(contextToken).container.get(
+        createContainerName('CONTACT', this.contactId),
+      );
     }
 
     return this.parentNetwork?.contact;
@@ -147,7 +161,9 @@ export class Network {
    */
   public get circuit(): Circuit | undefined {
     if (this.circuitId) {
-      return Container.get(createContainerName('CIRCUIT', this.circuitId));
+      return Container.get(contextToken).container.get(
+        createContainerName('CIRCUIT', this.circuitId),
+      );
     }
 
     return this.parentNetwork?.circuit;

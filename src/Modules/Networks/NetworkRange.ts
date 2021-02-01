@@ -1,11 +1,13 @@
 // src/Modules/Networks/NetworkRange.ts
 import { IsIP, IsOptional, IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
+import { Service } from 'typedi';
 import { NetworkRangeType } from './NetworkRangeType';
 
 @JSONSchema({
   title: 'NetworkRange',
 })
+@Service()
 export class NetworkRange {
   @IsString()
   @IsIP()

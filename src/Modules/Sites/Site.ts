@@ -2,7 +2,8 @@
 import { Transform, Type } from 'class-transformer';
 import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
+import { contextToken } from '../../Library/Context';
 import { setContainer } from '../../Utils/Containers';
 import { SiteDevice } from '../SiteDevice/SiteDevice';
 import { SiteType } from './SiteType';
@@ -38,7 +39,14 @@ export class Site {
 
   @ValidateNested({ each: true })
   @Transform((items: SiteDevice[]) => {
-    items.map((item) => setContainer('SITEDEVICE', item.id, item));
+    items.map((item) =>
+      setContainer(
+        'SITEDEVICE',
+        item.id,
+        item,
+        Container.get(contextToken).container,
+      ),
+    );
 
     return items;
   }, {})

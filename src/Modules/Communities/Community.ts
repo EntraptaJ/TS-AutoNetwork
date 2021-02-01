@@ -1,5 +1,5 @@
 // src/Modules/Communities/Community.ts
-import Container, { Service, Token } from 'typedi';
+import { Service, Token, Container } from 'typedi';
 import { createContainerName, setContainer } from '../../Utils/Containers';
 import { Site } from '../Sites/Site';
 import { Contact } from '../Contacts/Contact';

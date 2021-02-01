@@ -1,12 +1,14 @@
 // src/Modules/Networks/NetworkHostDevice.ts
 import { IsOptional, IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
+import { Service } from 'typedi';
 import { IsValidID } from '../../Utils/Validator';
 
 @JSONSchema({
   title: 'NetworkHostDevice',
   description: 'Community Site Device connection for a Network Host',
 })
+@Service()
 export class NetworkHostDevice {
   @IsString()
   @IsValidID('SITEDEVICE')

@@ -5,10 +5,12 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Address4 } from 'ip-address';
-import Container from 'typedi';
+import { Service, Container } from 'typedi';
+import { contextToken } from '../../Library/Context';
 import { createContainerName } from '../../Utils/Containers';
 import { Network } from './Network';
 
+@Service()
 @ValidatorConstraint({ name: 'ValidPrefix', async: false })
 export class ValidPrefix implements ValidatorConstraintInterface {
   public validate(prefix: string): boolean {
@@ -26,17 +28,13 @@ export class ValidPrefix implements ValidatorConstraintInterface {
 
 @ValidatorConstraint({ name: 'ValidSubnet', async: false })
 export class ValidSubnet implements ValidatorConstraintInterface {
-  public validate(
-    prefix: string,
-    args: ValidationArguments,
-    ...test: unknown[]
-  ): boolean {
+  public validate(prefix: string, args: ValidationArguments): boolean {
     try {
-      console.log('testfuck: ', ...test);
-
       return (
         (args.object as Network | undefined)?.IPv4.isInSubnet(
-          Container.get<Network>(createContainerName('NETWORK', prefix)).IPv4,
+          Container.get(contextToken).container.get<Network>(
+            createContainerName('NETWORK', prefix),
+          ).IPv4,
         ) || false
       );
     } catch {

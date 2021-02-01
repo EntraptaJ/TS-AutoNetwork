@@ -1,10 +1,19 @@
 // src/bin/runActions.ts
-import Container from 'typedi';
+import 'reflect-metadata';
 import { logger, LogMode } from '../Library/Logger';
-import { IPAMController } from '../Modules/IPAM/IPAMController';
+import { useContainer } from 'class-validator';
+import { Container } from 'typedi';
+
+useContainer(Container, {
+  fallback: true,
+  fallbackOnErrors: true,
+});
 
 try {
-  const ipamController = Container.get(IPAMController);
+  const [{ IPAMController }] = await Promise.all([
+    import('../Modules/IPAM/IPAMController'),
+  ]);
+  const ipamController = IPAMController.createIPAM();
 
   const config = await ipamController.loadIPAM('IPAM-Test.yaml');
   logger.log(LogMode.INFO, `Config loaded`, config);
@@ -15,5 +24,3 @@ try {
 
   process.exit(1);
 }
-
-// setInterval(() => console.log('Fucker'), 5000);

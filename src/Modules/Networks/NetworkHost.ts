@@ -2,7 +2,7 @@
 import { Type } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
-import Container, { Service } from 'typedi';
+import { Service, Container } from 'typedi';
 import { createContainerName } from '../../Utils/Containers';
 import { IsValidID } from '../../Utils/Validator';
 import { Contact } from '../Contacts/Contact';

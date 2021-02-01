@@ -1,16 +1,20 @@
 // src/Modules/Networks/NetworkController.ts
 import { Address4 } from 'ip-address';
-import Container, { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
+import { Context, contextToken } from '../../Library/Context';
 import { createContainerName } from '../../Utils/Containers';
 import { Network } from './Network';
 
 @Service()
 export class NetworkController {
+  @Inject(contextToken)
+  public context: Context;
+
   public get networks(): Network[] {
-    const networkIds = Container.getMany<string>('network');
+    const networkIds = this.context.container.getMany<string>('network');
 
     return networkIds.map((networkId) =>
-      Container.get(createContainerName('NETWORK', networkId)),
+      this.context.container.get(createContainerName('NETWORK', networkId)),
     );
   }
 
