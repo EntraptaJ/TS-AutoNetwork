@@ -75,8 +75,6 @@ export class IPAMSuite extends TestSuite {
       'Invalid Device ID Throws',
     );
 
-    Container.reset();
-
     /**
      * Invalid YAML #2 - Single Invalid Device ID
      */
